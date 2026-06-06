@@ -7,37 +7,6 @@
 // =========================================================
 
 /* ─────────────────────────────────────────
-
-// ─────────────────────────────────────────
-//  ASET LOKAL — ubah path sesuai folder kamu
-// ─────────────────────────────────────────
-const ASSETS = {
-  // 🎵 Musik (sync dengan BACKSOUND_SRC di audio.js)
-  music: 'assets/music/backsound.mp3',
-
-  // 🖼️ Logo — tampil di login & topbar
-  //   Kosongkan ('') kalau mau tetap pakai emoji 🦉
-  logo: 'assets/img/logo.png',
-
-  logoSize: 32,   // ukuran di topbar (px)
-  logoLogin: 72,  // ukuran di login screen (px)
-};
-
-function injectLogo() {
-  if (!ASSETS.logo) return;
-  const img = (size) =>
-    `<img src="${ASSETS.logo}" alt="EnglishKu" style="height:${size}px;width:${size}px;object-fit:contain;vertical-align:middle;display:inline-block;">`;
-
-  const loginOwl = document.querySelector('.logo-owl');
-  if (loginOwl) loginOwl.innerHTML = img(ASSETS.logoLogin);
-
-  document.querySelectorAll('.brand-owl').forEach(el => { el.innerHTML = img(ASSETS.logoSize); });
-
-  const wcOwl = document.querySelector('.wc-owl');
-  if (wcOwl) wcOwl.innerHTML = img(56);
-}
-
-
    1. SIGNAL PROCESSING – Audio Visualizer
    Real-time FFT + waveform using Web Audio API AnalyserNode
 ───────────────────────────────────────── */
@@ -597,7 +566,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Delay slightly so main app boots first
   setTimeout(() => {
     injectSecurityBadge();
-    injectLogo();
 
     // Secure the name input
     SecurityManager.secureInput(document.getElementById('inputName'));
@@ -632,17 +600,11 @@ function onHomeShown() {
   injectSessionTimer();
   SecurityManager.startSession();
   refreshTechStats();
-  // Backsound: play on home, injected mute btn
-  if (typeof BackSound !== 'undefined') {
-    if (!_bgMuted) BackSound.play();
-    _renderMuteBtn();
-  }
 }
 
 // Called by quiz.js when result screen is shown
 function onResultShown() {
   setTimeout(injectCompressionDemo, 300);
-  // Stop backsound on result screen, resume on home
 }
 
 // Called by quiz.js renderQuestion – inject media chips
