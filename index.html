@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnglishKu – Worksheet Interaktif Multimedia</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ======== LOGIN ======== -->
+  <div id="loginScreen" class="screen active">
+    <div class="login-bg">
+      <div class="float-blob b1"></div>
+      <div class="float-blob b2"></div>
+      <div class="float-blob b3"></div>
+    </div>
+    <div class="login-emoji-row">
+      <span style="--d:0s">📚</span><span style="--d:1.2s">✏️</span>
+      <span style="--d:2.1s">🌟</span><span style="--d:0.7s">🎒</span>
+      <span style="--d:1.8s">🎨</span><span style="--d:2.5s">🔤</span>
+    </div>
+    <div class="login-card">
+      <div class="logo-area">
+        <div class="logo-owl">🦉</div>
+        <h1>EnglishKu</h1>
+        <p>Worksheet Interaktif Bahasa Inggris SD</p>
+      </div>
+      <!-- security badge injected here by multimedia.js -->
+      <div class="form-group">
+        <label>Nama Kamu</label>
+        <input type="text" id="inputName" placeholder="Tulis nama kamu..." maxlength="30" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+        <label>Pilih Kelas</label>
+        <div class="class-grid">
+          <button class="cls-btn" data-class="3">Kelas 3</button>
+          <button class="cls-btn" data-class="4">Kelas 4</button>
+          <button class="cls-btn" data-class="5">Kelas 5</button>
+          <button class="cls-btn" data-class="6">Kelas 6</button>
+        </div>
+      </div>
+      <button id="btnStart" class="btn-primary" disabled>Mulai Belajar! 🚀</button>
+      <p class="login-note">Semangat belajar & raih bintang terbanyak! ⭐</p>
+    </div>
+  </div>
+
+  <!-- ======== HOME ======== -->
+  <div id="homeScreen" class="screen">
+    <header class="topbar">
+      <div class="topbar-brand">
+        <span class="brand-owl">🦉</span>
+        <span class="brand-name">EnglishKu</span>
+      </div>
+      <div class="topbar-right">
+        <!-- session timer injected by multimedia.js -->
+        <div class="tb-player">
+          <span id="tbName">-</span>
+          <span id="tbClass" class="pill pill-teal">Kelas 3</span>
+        </div>
+        <div class="tb-score pill pill-yellow">⭐ <span id="tbScore">0</span></div>
+        <button class="tb-logout" onclick="logout()">Keluar</button>
+      </div>
+    </header>
+    <main class="home-wrap">
+      <div class="welcome-card">
+        <div class="wc-text">
+          <h2>Halo, <span id="wcName">Teman</span>! 👋</h2>
+          <p>Siap belajar Bahasa Inggris hari ini?</p>
+          <div class="wc-stats">
+            <span class="wc-stat" id="wcTopicsDone">📚 0 Topik Selesai</span>
+            <span class="wc-stat" id="wcTotalPts">⭐ 0 Poin</span>
+          </div>
+        </div>
+        <div class="wc-owl">🦉</div>
+      </div>
+      <section class="home-section">
+        <h3 class="sec-title">Progress Kamu</h3>
+        <div id="progressGrid" class="progress-grid"></div>
+      </section>
+      <section class="home-section">
+        <h3 class="sec-title">Pilih Materi</h3>
+        <div id="topicGrid" class="topic-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ======== QUIZ ======== -->
+  <div id="quizScreen" class="screen">
+    <header class="topbar">
+      <button class="btn-back" onclick="backToHome()">← Kembali</button>
+      <div class="topbar-brand" style="flex:1;justify-content:center;">
+        <span id="quizTitle" style="font-weight:800;font-size:1rem;">-</span>
+        <span id="quizBadge" class="pill pill-teal" style="margin-left:.4rem">Kelas 3</span>
+      </div>
+      <div class="topbar-right" style="gap:.5rem">
+        <span class="pill pill-white">❓ <span id="qNum">1</span>/<span id="qTot">5</span></span>
+        <span class="pill pill-yellow">⭐ <span id="qScore">0</span></span>
+      </div>
+    </header>
+    <div class="qprogbar-wrap"><div id="qprogbar" class="qprogbar-fill" style="width:0%"></div></div>
+    <div class="quiz-body">
+      <div id="qContainer" class="q-container"></div>
+    </div>
+    <div id="feedbackOverlay" class="fb-overlay hidden">
+      <div class="fb-box">
+        <div id="fbIcon" class="fb-icon">✅</div>
+        <div id="fbMsg" class="fb-msg">Benar!</div>
+        <div id="fbExp" class="fb-exp"></div>
+        <button class="btn-primary" onclick="nextQuestion()">Lanjut →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== RESULT ======== -->
+  <div id="resultScreen" class="screen result-bg">
+    <div class="result-card">
+      <div id="resEmoji" class="res-emoji">🎉</div>
+      <h2 id="resTitle">Selesai!</h2>
+      <div class="res-score-box">
+        <div class="rsl">Skor Kamu</div>
+        <div id="resPts" class="res-pts">0</div>
+        <div id="resMax" class="res-max">dari 0</div>
+      </div>
+      <div id="resMsg" class="res-msg"></div>
+      <div id="resStars" class="res-stars"></div>
+      <div class="result-tech-note">
+        💡 <span>Data skor kamu dikompresi & dienkripsi secara otomatis sebelum disimpan.</span>
+      </div>
+      <!-- compression demo injected by multimedia.js -->
+      <div class="res-btns" style="margin-top:1rem">
+        <button class="btn-secondary" onclick="retryQuiz()">Coba Lagi 🔄</button>
+        <button class="btn-primary" onclick="backToHome()">Materi Lain 🏠</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/multimedia.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

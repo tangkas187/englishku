@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EnglishKu – Guidebook Sistem Multimedia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange:#FF6B35; --teal:#00C9B1; --green:#22C55E;
+      --purple:#8B5CF6; --blue:#3B82F6; --red:#EF4444;
+      --text:#1E293B; --text-m:#64748B; --border:#E2D9CE;
+      --bg:#FDF6EE;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',sans-serif;color:var(--text);background:#fff;font-size:11pt;line-height:1.6;}
+    a{color:var(--orange);}
+
+    /* ── PRINT ── */
+    @media print {
+      .no-print{display:none!important;}
+      body{font-size:10pt;}
+      .page-break{page-break-before:always;}
+      .cover{page-break-after:always;}
+      .section{page-break-inside:avoid;}
+    }
+
+    /* ── SCREEN HELPER ── */
+    .print-btn{
+      position:fixed;top:20px;right:20px;z-index:999;
+      background:var(--orange);color:#fff;border:none;
+      padding:.7rem 1.4rem;border-radius:10px;
+      font-family:'Nunito',sans-serif;font-weight:800;
+      font-size:.95rem;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,53,.4);
+      transition:all .2s;
+    }
+    .print-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,53,.5);}
+
+    /* ── COVER ── */
+    .cover{
+      min-height:100vh;
+      background:linear-gradient(135deg,#FF6B35 0%,#FF9150 40%,#FFD166 100%);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:3rem 2rem;color:#fff;
+    }
+    .cover-owl{font-size:6rem;margin-bottom:1rem;filter:drop-shadow(0 8px 16px rgba(0,0,0,.2));}
+    .cover h1{font-family:'Fredoka One',cursive;font-size:3.5rem;line-height:1.1;margin-bottom:.5rem;}
+    .cover-sub{font-size:1.2rem;opacity:.9;margin-bottom:2rem;max-width:520px;}
+    .cover-meta{
+      background:rgba(255,255,255,.2);
+      border-radius:16px;padding:1.2rem 2rem;
+      display:grid;grid-template-columns:1fr 1fr;gap:.6rem 2rem;
+      text-align:left;font-size:.9rem;
+    }
+    .cover-meta dt{opacity:.75;font-size:.8rem;}
+    .cover-meta dd{font-weight:800;}
+    .cover-badges{display:flex;gap:.8rem;margin-top:1.5rem;flex-wrap:wrap;justify-content:center;}
+    .cbadge{
+      background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);
+      border-radius:100px;padding:.35rem 1rem;
+      font-size:.82rem;font-weight:800;
+    }
+
+    /* ── LAYOUT ── */
+    .doc-body{max-width:900px;margin:0 auto;padding:3rem 2rem;}
+
+    /* ── HEADINGS ── */
+    h2{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--orange);margin:2.5rem 0 1rem;display:flex;align-items:center;gap:.5rem;}
+    h2 .hnum{font-size:1.2rem;background:var(--orange);color:#fff;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;}
+    h3{font-size:1.1rem;font-weight:800;color:var(--text);margin:1.5rem 0 .6rem;}
+    h4{font-size:.95rem;font-weight:800;color:var(--text-m);margin:.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.5px;}
+
+    /* ── SECTION CARD ── */
+    .section{
+      background:#fff;border:2px solid var(--border);
+      border-radius:16px;padding:1.5rem 1.8rem;
+      margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,.05);
+    }
+    .section.teal  {border-left:5px solid var(--teal);}
+    .section.orange{border-left:5px solid var(--orange);}
+    .section.purple{border-left:5px solid var(--purple);}
+    .section.green {border-left:5px solid var(--green);}
+    .section.blue  {border-left:5px solid var(--blue);}
+    .section.red   {border-left:5px solid var(--red);}
+
+    /* ── TABLE ── */
+    table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem;}
+    th{background:var(--bg);padding:.6rem .9rem;text-align:left;font-weight:800;border-bottom:2px solid var(--border);}
+    td{padding:.55rem .9rem;border-bottom:1px solid var(--border);vertical-align:top;}
+    tr:last-child td{border-bottom:none;}
+    .tag{display:inline-block;padding:.15rem .5rem;border-radius:6px;font-size:.72rem;font-weight:800;}
+    .tag-green{background:#DCFCE7;color:#16A34A;}
+    .tag-orange{background:#FFF0EB;color:#E5541E;}
+    .tag-blue{background:#DBEAFE;color:#1D4ED8;}
+    .tag-purple{background:#EDE9FE;color:#6D28D9;}
+    .tag-red{background:#FEE2E2;color:#DC2626;}
+
+    /* ── CODE BLOCK ── */
+    pre{background:#1E293B;color:#E2E8F0;border-radius:10px;padding:1rem 1.2rem;font-size:.78rem;line-height:1.7;overflow-x:auto;margin:.7rem 0;}
+    code{font-family:'Courier New',monospace;font-size:.85em;}
+    .comment{color:#64748B;}
+    .keyword{color:#7DD3FC;}
+    .string{color:#86EFAC;}
+    .func{color:#FDE68A;}
+
+    /* ── FLOW DIAGRAM ── */
+    .flow{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.8rem 0;}
+    .flow-step{
+      background:var(--bg);border:2px solid var(--border);
+      border-radius:10px;padding:.5rem .9rem;
+      font-size:.8rem;font-weight:700;
+      text-align:center;min-width:90px;
+    }
+    .flow-arrow{font-size:1.1rem;color:var(--text-m);}
+    .flow-step.highlight{background:var(--orange);color:#fff;border-color:var(--orange);}
+    .flow-step.teal{background:var(--teal);color:#fff;border-color:var(--teal);}
+    .flow-step.green{background:var(--green);color:#fff;border-color:var(--green);}
+
+    /* ── CALLOUT ── */
+    .callout{
+      border-radius:12px;padding:1rem 1.2rem;margin:.8rem 0;
+      display:flex;align-items:flex-start;gap:.7rem;font-size:.88rem;
+    }
+    .callout.info{background:#DBEAFE;border-left:4px solid var(--blue);}
+    .callout.warn{background:#FEF3C7;border-left:4px solid #F59E0B;}
+    .callout.tip {background:#DCFCE7;border-left:4px solid var(--green);}
+    .callout-icon{font-size:1.2rem;flex-shrink:0;}
+
+    /* ── SPEC TABLE ── */
+    .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0;}
+    .spec-item{background:var(--bg);border-radius:10px;padding:.8rem 1rem;}
+    .spec-key{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-m);margin-bottom:.2rem;}
+    .spec-val{font-weight:800;font-size:.95rem;color:var(--text);}
+
+    /* ── FOOTER ── */
+    .doc-footer{
+      text-align:center;padding:2rem;
+      font-size:.8rem;color:var(--text-m);
+      border-top:2px solid var(--border);margin-top:3rem;
+    }
+
+    /* ── ARCH DIAGRAM ── */
+    .arch{
+      background:var(--bg);border:2px solid var(--border);
+      border-radius:12px;padding:1.2rem;margin:.8rem 0;
+      font-size:.78rem;
+    }
+    .arch-row{display:flex;align-items:stretch;gap:.6rem;margin:.3rem 0;}
+    .arch-layer{
+      background:#fff;border:2px solid var(--border);border-radius:8px;
+      padding:.5rem .8rem;font-weight:700;font-size:.75rem;
+      display:flex;align-items:center;justify-content:center;text-align:center;
+    }
+    .arch-label{writing-mode:vertical-rl;text-orientation:mixed;font-size:.65rem;font-weight:800;color:var(--text-m);padding:.3rem .2rem;letter-spacing:1px;text-transform:uppercase;}
+    .arch-layer.wide{flex:1;}
+    .arch-layer.orange-bg{background:var(--orange);color:#fff;border-color:var(--orange);}
+    .arch-layer.teal-bg{background:var(--teal);color:#fff;border-color:var(--teal);}
+    .arch-layer.purple-bg{background:var(--purple);color:#fff;border-color:var(--purple);}
+    .arch-layer.green-bg{background:var(--green);color:#fff;border-color:var(--green);}
+    .arch-layer.blue-bg{background:var(--blue);color:#fff;border-color:var(--blue);}
+  </style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+
+<!-- ══════════════════════════════════════════════
+     COVER PAGE
+══════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-owl">🦉</div>
+  <h1>EnglishKu</h1>
+  <p class="cover-sub">Sistem Worksheet Interaktif Bahasa Inggris SD<br>Berbasis Teknologi Multimedia</p>
+  <dl class="cover-meta">
+    <dt>Mata Kuliah</dt><dd>Sistem Multimedia</dd>
+    <dt>Platform</dt><dd>Web (HTML5 / Vanilla JS)</dd>
+    <dt>Target Pengguna</dt><dd>Siswa SD Kelas 3–6</dd>
+    <dt>Versi</dt><dd>2.0 – Multimedia Edition</dd>
+  </dl>
+  <div class="cover-badges">
+    <span class="cbadge">🔊 Signal Processing</span>
+    <span class="cbadge">📦 Kompresi Data</span>
+    <span class="cbadge">🔒 Keamanan</span>
+    <span class="cbadge">🎤 Speech Recognition</span>
+    <span class="cbadge">🖱 Drag & Drop</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BODY
+══════════════════════════════════════════════ -->
+<div class="doc-body">
+
+  <!-- ── 1. OVERVIEW ── -->
+  <h2><span class="hnum">1</span> Gambaran Umum Sistem</h2>
+
+  <div class="section orange">
+    <h3>Deskripsi Sistem</h3>
+    <p>EnglishKu adalah aplikasi worksheet interaktif berbasis web untuk pembelajaran Bahasa Inggris siswa SD kelas 3–6. Sistem ini mengintegrasikan <strong>5 elemen multimedia</strong> (teks, audio, visual, animasi, interaksi) dengan teknik pemrosesan multimedia berupa signal processing, kompresi data, dan keamanan informasi.</p>
+  </div>
+
+  <div class="section blue">
+    <h3>Arsitektur Sistem</h3>
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-label">UI Layer</div>
+        <div class="arch-layer orange-bg wide">index.html – Struktur 4 Screen (Login · Home · Quiz · Result)</div>
+        <div class="arch-layer orange-bg wide">main.css – Responsive Layout + Animasi</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-label">App Logic</div>
+        <div class="arch-layer teal-bg wide">app.js – Navigasi, Login, State</div>
+        <div class="arch-layer teal-bg wide">quiz.js – Engine: MC, Fill, Drag, Voice, Match</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-label">Multimedia</div>
+        <div class="arch-layer purple-bg wide">multimedia.js – Visualizer FFT, Kompresi, Security Panel</div>
+        <div class="arch-layer purple-bg wide">audio.js – Web Audio API Signal Generation</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-label">Data</div>
+        <div class="arch-layer green-bg wide">storage.js – XOR Encrypt + Checksum + Compress</div>
+        <div class="arch-layer green-bg wide">data.js – 12 Topik, 107+ Soal, 4 Kelas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section green">
+    <h3>Spesifikasi Teknis</h3>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-key">Platform</div><div class="spec-val">Web (offline-ready)</div></div>
+      <div class="spec-item"><div class="spec-key">Dependencies</div><div class="spec-val">Zero — Vanilla JS only</div></div>
+      <div class="spec-item"><div class="spec-key">Browser Support</div><div class="spec-val">Chrome 80+, Edge 80+</div></div>
+      <div class="spec-item"><div class="spec-key">Total File Size</div><div class="spec-val">~85 KB (unzipped)</div></div>
+      <div class="spec-item"><div class="spec-key">Konten</div><div class="spec-val">12 topik · 107+ soal</div></div>
+      <div class="spec-item"><div class="spec-key">Tipe Soal</div><div class="spec-val">5 tipe berbeda</div></div>
+    </div>
+  </div>
+
+  <!-- ── 2. ELEMEN MEDIA ── -->
+  <h2 class="page-break"><span class="hnum">2</span> Elemen Media</h2>
+
+  <table>
+    <thead><tr><th>Elemen</th><th>Implementasi</th><th>Teknologi</th><th>Keterangan</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>📝 Teks</strong></td>
+        <td>Soal, instruksi, penjelasan, feedback</td>
+        <td>HTML5 + CSS3</td>
+        <td>Nunito + Fredoka One font, tipografi hierarki jelas</td>
+      </tr>
+      <tr>
+        <td><strong>🔊 Audio</strong></td>
+        <td>Feedback benar/salah, fanfare selesai</td>
+        <td>Web Audio API</td>
+        <td>Tone di-generate real-time via oscillator node</td>
+      </tr>
+      <tr>
+        <td><strong>🖼 Visual</strong></td>
+        <td>Emoji gambar, ikon, ilustrasi</td>
+        <td>Unicode SVG Emoji</td>
+        <td>Skalabel, tidak butuh file gambar eksternal</td>
+      </tr>
+      <tr>
+        <td><strong>🎬 Animasi</strong></td>
+        <td>Fade-up, wiggle, pulse, shake</td>
+        <td>CSS @keyframes</td>
+        <td>Animasi masuk layar, feedback interaksi</td>
+      </tr>
+      <tr>
+        <td><strong>🖱 Interaktif</strong></td>
+        <td>Drag & Drop, Voice, Match, Fill, MC</td>
+        <td>JS Events + Speech API</td>
+        <td>5 tipe soal berbeda per topik</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout info">
+    <span class="callout-icon">ℹ️</span>
+    <span>Setiap soal menampilkan <strong>Media Type Badge</strong> (Text/Audio/Visual/Interaktif) yang menunjukkan elemen multimedia apa yang digunakan pada soal tersebut.</span>
+  </div>
+
+  <!-- ── 3. SIGNAL PROCESSING ── -->
+  <h2 class="page-break"><span class="hnum">3</span> Signal Processing</h2>
+
+  <div class="section teal">
+    <h3>3.1 Audio Signal Generation (audio.js)</h3>
+    <p>Semua suara feedback di-generate secara programatik menggunakan <strong>Web Audio API</strong> tanpa file audio eksternal. Ini merupakan implementasi signal processing murni di browser.</p>
+
+    <h4>Alur pemrosesan sinyal:</h4>
+    <div class="flow">
+      <div class="flow-step highlight">OscillatorNode<br/><small>Sumber sinyal</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">GainNode<br/><small>Amplitudo</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step teal">Envelope<br/><small>Attack+Decay</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step green">AudioDestination<br/><small>Output speaker</small></div>
+    </div>
+
+    <table>
+      <thead><tr><th>Event</th><th>Frekuensi</th><th>Waveform</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td>Jawaban Benar</td><td>523, 659, 784 Hz</td><td>Triangle</td><td>C major arpeggio (C5-E5-G5)</td></tr>
+        <tr><td>Jawaban Salah</td><td>220 → 185 Hz</td><td>Sawtooth</td><td>Descending dissonant</td></tr>
+        <tr><td>Quiz Selesai</td><td>261–784 Hz</td><td>Triangle</td><td>C major scale fanfare</td></tr>
+        <tr><td>Klik tombol</td><td>800 Hz</td><td>Sine</td><td>Tick pendek</td></tr>
+      </tbody>
+    </table>
+
+<pre><span class="comment">// audio.js – Signal envelope implementation</span>
+<span class="keyword">function</span> <span class="func">playTone</span>(frequency, duration, type, volume) {
+  <span class="keyword">const</span> oscillator = audioCtx.createOscillator();
+  <span class="keyword">const</span> gainNode   = audioCtx.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  oscillator.type = type; <span class="comment">// 'sine' | 'triangle' | 'sawtooth'</span>
+  oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+
+  <span class="comment">// Envelope: attack (0→volume) + decay (volume→0)</span>
+  gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+  gainNode.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+}</pre>
+  </div>
+
+  <div class="section teal">
+    <h3>3.2 Real-time FFT Audio Visualizer (multimedia.js)</h3>
+    <p>AnalyserNode Web Audio API digunakan untuk analisis frekuensi real-time (Fast Fourier Transform) dan divisualisasikan sebagai bar chart dinamis di bagian bawah layar.</p>
+
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-key">FFT Size</div><div class="spec-val">64-point</div></div>
+      <div class="spec-item"><div class="spec-key">Frequency Bins</div><div class="spec-val">32 bins</div></div>
+      <div class="spec-item"><div class="spec-key">Smoothing</div><div class="spec-val">0.75</div></div>
+      <div class="spec-item"><div class="spec-key">Update Rate</div><div class="spec-val">~60 fps (rAF)</div></div>
+    </div>
+
+<pre><span class="comment">// multimedia.js – FFT Analyzer setup</span>
+analyser = audioCtx.createAnalyser();
+analyser.fftSize = <span class="string">64</span>;              <span class="comment">// 32 frequency bins</span>
+analyser.smoothingTimeConstant = <span class="string">0.75</span>; <span class="comment">// temporal smoothing</span>
+dataArray = <span class="keyword">new</span> Uint8Array(analyser.frequencyBinCount);
+
+<span class="comment">// In animation loop:</span>
+analyser.getByteFrequencyData(dataArray);  <span class="comment">// FFT frequency domain</span>
+analyser.getByteTimeDomainData(timeDomain); <span class="comment">// time domain waveform</span></pre>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span>Panel ⚙️ di pojok kanan bawah aplikasi menampilkan <strong>live waveform, peak frequency, dan RMS amplitude</strong> secara real-time saat audio diputar.</span>
+    </div>
+  </div>
+
+  <div class="section teal">
+    <h3>3.3 Speech Recognition – Voice Question (quiz.js)</h3>
+    <p>Soal tipe "Latihan Bicara" menggunakan <strong>Web Speech API (SpeechRecognition)</strong> untuk menangkap ucapan siswa dan membandingkannya dengan target kalimat.</p>
+
+    <h4>Algoritma matching:</h4>
+    <div class="flow">
+      <div class="flow-step highlight">Record Audio</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Speech → Text</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Normalize</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step teal">Word Match ≥60%</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step green">Score</div>
+    </div>
+
+<pre><span class="comment">// Fuzzy word matching (toleransi aksen Indonesia)</span>
+<span class="keyword">const</span> tWords = target.split(<span class="string">/\s+/</span>);
+<span class="keyword">const</span> sWords = said.split(<span class="string">/\s+/</span>);
+<span class="keyword">const</span> matched = tWords.filter(w => sWords.includes(w)).length;
+<span class="keyword">const</span> correct = matched / tWords.length >= <span class="string">0.6</span>; <span class="comment">// 60% threshold</span></pre>
+  </div>
+
+  <!-- ── 4. KOMPRESI ── -->
+  <h2 class="page-break"><span class="hnum">4</span> Kompresi Data</h2>
+
+  <div class="section orange">
+    <h3>4.1 Pipeline Kompresi (storage.js + multimedia.js)</h3>
+    <p>Data skor diproses melalui <strong>dua tahap kompresi</strong> sebelum disimpan ke localStorage:</p>
+
+    <div class="flow">
+      <div class="flow-step">AppState<br/><small>JSON object</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step highlight">Pattern Sub<br/><small>~35% hemat</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step highlight">XOR + Base64<br/><small>Enkripsi</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step green">localStorage<br/><small>Tersimpan</small></div>
+    </div>
+
+    <h4>Tahap 1 – Pattern Substitution (lossless)</h4>
+    <table>
+      <thead><tr><th>Pattern Asli</th><th>Diganti</th><th>Penghematan</th></tr></thead>
+      <tbody>
+        <tr><td><code>"score":</code></td><td><code>"s":</code></td><td>6 karakter per occurrence</td></tr>
+        <tr><td><code>"attempts":</code></td><td><code>"a":</code></td><td>8 karakter per occurrence</td></tr>
+        <tr><td><code>"completed":false</code></td><td><code>"c":0</code></td><td>14 karakter</td></tr>
+        <tr><td><code>"completed":true</code></td><td><code>"c":1</code></td><td>13 karakter</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Tahap 2 – Run-Length Encoding (RLE) untuk teks</h4>
+<pre><span class="comment">// multimedia.js – RLE encoder</span>
+<span class="keyword">function</span> <span class="func">rleEncode</span>(str) {
+  <span class="keyword">let</span> result = <span class="string">''</span>, i = 0;
+  <span class="keyword">while</span> (i < str.length) {
+    <span class="keyword">let</span> count = 1;
+    <span class="keyword">while</span> (str[i + count] === str[i] && count < 255) count++;
+    result += (count > 1 ? count : <span class="string">''</span>) + str[i];
+    i += count;
+  }
+  <span class="keyword">return</span> result; <span class="comment">// e.g. "aaabbc" → "3a2bc"</span>
+}</pre>
+
+    <h4>Tahap 3 – Canvas Image Compression</h4>
+    <p>Modul <code>CompressionEngine.compressImageDataURL()</code> di multimedia.js mengimplementasikan kompresi gambar berbasis Canvas API (setara flutter_image_compress):</p>
+<pre><span class="comment">// multimedia.js – Canvas-based image compression</span>
+<span class="keyword">function</span> <span class="func">compressImageDataURL</span>(dataURL, quality=<span class="string">0.6</span>, maxW=<span class="string">800</span>) {
+  canvas.width  = Math.round(img.width  * scale);   <span class="comment">// resize</span>
+  canvas.height = Math.round(img.height * scale);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  <span class="keyword">return</span> canvas.toDataURL(<span class="string">'image/jpeg'</span>, quality);   <span class="comment">// JPEG compress</span>
+}</pre>
+
+    <div class="callout tip">
+      <span class="callout-icon">📊</span>
+      <span>Hasil kompresi ditampilkan secara visual di layar <strong>Result</strong> setiap kali siswa menyelesaikan quiz, lengkap dengan bar chart perbandingan ukuran data sebelum dan sesudah kompresi.</span>
+    </div>
+  </div>
+
+  <!-- ── 5. KEAMANAN ── -->
+  <h2 class="page-break"><span class="hnum">5</span> Keamanan Data</h2>
+
+  <div class="section red">
+    <h3>5.1 Enkripsi XOR + Base64 (storage.js)</h3>
+    <p>Data skor dienkripsi menggunakan XOR cipher dengan kunci <code>'EnglishKu2024'</code> sebelum di-encode Base64 dan disimpan. Data tidak bisa dibaca langsung dari DevTools.</p>
+
+<pre><span class="comment">// storage.js – XOR cipher</span>
+<span class="keyword">function</span> <span class="func">encode</span>(str) {
+  <span class="keyword">const</span> key = <span class="string">'EnglishKu2024'</span>;
+  <span class="keyword">let</span> result = <span class="string">''</span>;
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = 0; i < str.length; i++) {
+    result += String.fromCharCode(
+      str.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+    );
+  }
+  <span class="keyword">return</span> btoa(result); <span class="comment">// → Base64</span>
+}</pre>
+
+    <h3>5.2 Integritas Data – Checksum</h3>
+    <p>Setiap kali data disimpan, dihitung <strong>checksum hash</strong>. Saat data dimuat, checksum diverifikasi. Jika tidak cocok (data dimanipulasi), data direset.</p>
+
+<pre><span class="comment">// storage.js – Djb2-variant hash checksum</span>
+_checksum(str) {
+  <span class="keyword">let</span> hash = 0;
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = hash & hash; <span class="comment">// Convert to 32-bit int</span>
+  }
+  <span class="keyword">return</span> hash.toString(16);
+}</pre>
+
+    <h3>5.3 Input Sanitization (multimedia.js)</h3>
+    <p>Semua input teks (nama siswa) dibersihkan real-time dari karakter berbahaya:</p>
+    <table>
+      <thead><tr><th>Ancaman</th><th>Mitigasi</th></tr></thead>
+      <tbody>
+        <tr><td>HTML Injection</td><td>Strip semua tag <code>&lt;...&gt;</code></td></tr>
+        <tr><td>Script Injection</td><td>Remove <code>javascript:</code> dan <code>on*=</code></td></tr>
+        <tr><td>Overflow</td><td>Max 30 karakter, trim whitespace</td></tr>
+        <tr><td>Paste attack</td><td>intercept paste event, sanitize before insert</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5.4 Session Timeout (multimedia.js)</h3>
+    <p>Timer sesi 30 menit aktif saat home screen terbuka. Data di-auto-save sebelum timeout. Timer ditampilkan real-time di topbar.</p>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span>Untuk deployment produksi, disarankan menggunakan <strong>HTTPS</strong>. Aplikasi mendeteksi protokol secara otomatis dan menampilkan peringatan jika bukan HTTPS/localhost.</span>
+    </div>
+  </div>
+
+  <!-- ── 6. TIPE SOAL ── -->
+  <h2 class="page-break"><span class="hnum">6</span> Tipe Soal &amp; Interaksi</h2>
+
+  <table>
+    <thead><tr><th>Tipe</th><th>Cara Kerja</th><th>Elemen Media</th><th>Kelas</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="tag tag-blue">Pilihan Ganda</span></td>
+        <td>Klik salah satu dari 4 pilihan</td>
+        <td>Teks, Visual, Interaktif</td>
+        <td>3–6</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-purple">Isi Titik</span></td>
+        <td>Klik word bank → isi ke blank</td>
+        <td>Teks, Interaktif</td>
+        <td>3–6</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-green">Drag &amp; Drop</span></td>
+        <td>Seret item ke kategori kotak</td>
+        <td>Visual, Interaktif</td>
+        <td>3–6</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-orange">Latihan Bicara</span></td>
+        <td>Tekan mic → ucapkan kalimat → cek</td>
+        <td>Audio, Teks, Interaktif</td>
+        <td>3–6</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-red">Pasangkan</span></td>
+        <td>Klik item kiri + kanan secara berpasangan</td>
+        <td>Teks, Interaktif</td>
+        <td>3–6</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── 7. KONTEN ── -->
+  <h2><span class="hnum">7</span> Konten Materi</h2>
+
+  <table>
+    <thead><tr><th>Kelas</th><th>Topik</th><th>Jumlah Soal</th><th>Tipe Soal</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3"><strong>Kelas 3</strong></td><td>🍔 Food &amp; Drink</td><td>10</td><td>MC, Fill, Drag, Voice</td></tr>
+      <tr><td>🏃 Daily Activity</td><td>8</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td>📦 Prepositions</td><td>8</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td rowspan="3"><strong>Kelas 4</strong></td><td>🚌 Transportation</td><td>9</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td>⏰ Telling Time</td><td>8</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td>📅 Daily Schedule</td><td>8</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td rowspan="3"><strong>Kelas 5</strong></td><td>🦁 Animals</td><td>10</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td>🎨 Adjectives</td><td>9</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td>📊 Degree of Comparison</td><td>8</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td rowspan="3"><strong>Kelas 6</strong></td><td>🚀 Future Tense</td><td>9</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td>📢 Announcement</td><td>8</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+      <tr><td>👨‍💼 Jobs &amp; Professions</td><td>9</td><td>MC, Fill, Drag, Voice, Match</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── 8. CARA PENGGUNAAN ── -->
+  <h2 class="page-break"><span class="hnum">8</span> Panduan Penggunaan</h2>
+
+  <div class="section green">
+    <h3>Cara Menjalankan</h3>
+    <ol style="padding-left:1.3rem;line-height:2.2;">
+      <li>Ekstrak file ZIP ke folder mana saja</li>
+      <li>Buka <code>index.html</code> menggunakan <strong>Google Chrome</strong> atau <strong>Microsoft Edge</strong></li>
+      <li>Tidak perlu koneksi internet (semua aset lokal)</li>
+      <li>Untuk fitur Speech Recognition, izinkan akses mikrofon saat diminta browser</li>
+    </ol>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span>Speech Recognition <strong>tidak berfungsi di Firefox</strong>. Gunakan Chrome atau Edge. Jika browser tidak support, soal voice bisa dilewati.</span>
+    </div>
+
+    <h3>Alur Pengguna</h3>
+    <div class="flow">
+      <div class="flow-step highlight">Login<br/><small>Nama + Kelas</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Home<br/><small>Pilih Topik</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step teal">Quiz<br/><small>Jawab Soal</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step green">Result<br/><small>Skor + Stats</small></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Home<br/><small>Topik Lain</small></div>
+    </div>
+  </div>
+
+  <div class="section blue">
+    <h3>Poin Teknis yang Bisa Dipresentasikan</h3>
+    <table>
+      <thead><tr><th>Poin Dosen</th><th>Implementasi di EnglishKu</th><th>Lokasi</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Signal Processing</strong></td>
+          <td>Web Audio API FFT 64-point, real-time waveform visualizer, envelope generator, speech recognition</td>
+          <td><code>audio.js</code>, <code>multimedia.js</code></td>
+        </tr>
+        <tr>
+          <td><strong>Kompresi</strong></td>
+          <td>Pattern substitution (~35% saving), RLE encoding, Canvas JPEG compression (quality=0.6), demo visual di result screen</td>
+          <td><code>storage.js</code>, <code>multimedia.js</code></td>
+        </tr>
+        <tr>
+          <td><strong>Keamanan</strong></td>
+          <td>XOR encryption + Base64, checksum integrity, input sanitization (HTML/JS injection), session timeout 30 menit, HTTPS detection</td>
+          <td><code>storage.js</code>, <code>multimedia.js</code></td>
+        </tr>
+        <tr>
+          <td><strong>Elemen Media</strong></td>
+          <td>Teks, audio (generated), visual (emoji/CSS), animasi CSS, 5 tipe interaksi berbeda</td>
+          <td>Semua file</td>
+        </tr>
+        <tr>
+          <td><strong>Sistem Jadi</strong></td>
+          <td>Aplikasi penuh: login, home, quiz engine, result, progress tracking, offline-ready</td>
+          <td>Seluruh sistem</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── 9. STRUKTUR FILE ── -->
+  <h2><span class="hnum">9</span> Struktur File Proyek</h2>
+<pre style="font-size:.8rem;">english-worksheet/
+├── index.html          ← Entry point, 4 screen utama
+├── guidebook.html      ← Dokumen ini (PDF Guidebook)
+├── css/
+│   └── main.css        ← Seluruh styling + multimedia UI
+└── js/
+    ├── data.js         ← 107+ soal, 12 topik, 4 kelas
+    ├── storage.js      ← Enkripsi XOR + kompresi + checksum
+    ├── audio.js        ← Web Audio API signal generation
+    ├── multimedia.js   ← FFT visualizer + compression demo + security
+    ├── quiz.js         ← Engine: MC, Fill, Drag, Voice, Match
+    └── app.js          ← Controller: navigasi, login, state</pre>
+
+</div><!-- /doc-body -->
+
+<div class="doc-footer">
+  <strong>EnglishKu</strong> · Sistem Worksheet Interaktif Multimedia · Kelas 3–6 SD<br/>
+  Dibuat untuk memenuhi tugas akhir Mata Kuliah Sistem Multimedia
+</div>
+
+</body>
+</html>
