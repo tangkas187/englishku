@@ -57,10 +57,24 @@ function compressAndShow(url, imgId) {
     canvas.width = img.width * scale;
     canvas.height = img.height * scale;
     const ctx = canvas.getContext('2d');
+    
+    // gambar ulang ke canvas
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     
-    // Kompresi ke JPEG 50%
-    const compressedData = canvas.toDataURL('image/jpeg', 0.5);
+    // pakai webp biar kompresi jalan tapi transparan tetap aman
+    const compressedData = canvas.toDataURL('image/webp', 0.6);
+    
+    // logika log buat bukti kompresi tetep jalan
+    const uncompressedData = canvas.toDataURL('image/png');
+    const sizeAsli = (uncompressedData.length * 0.75 / 1024).toFixed(2);
+    const sizeKompres = (compressedData.length * 0.75 / 1024).toFixed(2);
+    const hemat = (100 - (sizeKompres / sizeAsli * 100)).toFixed(1);
+    
+    console.log(`🖼️ [KOMPRESI MULTIMEDIA] -> ${url}`);
+    console.log(`   ▪ Mentah : ${sizeAsli} KB`);
+    console.log(`   ▪ WebP (60%) : ${sizeKompres} KB`);
+    console.log(`   ▪ Hemat : ${hemat}% 📉`);
+
     const imgEl = document.getElementById(imgId);
     if (imgEl) {
       imgEl.src = compressedData;

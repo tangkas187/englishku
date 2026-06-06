@@ -4,16 +4,16 @@ const TOPICS = {
     {
       id:'food', name:'Food & Drink', icon:'🍔', color:'#FF6B35',
       questions:[
-        { type:'mc', q:'What is this food called in English?', img:'🍎', choices:['Apple','Banana','Mango','Orange'], answer:0, exp:'"Apple" = buah apel.' },
-        { type:'mc', q:'Which one is a DRINK?', img:null, choices:['🍚 Rice','🥛 Milk','🍞 Bread','🥕 Carrot'], answer:1, exp:'"Milk" (susu) adalah minuman.' },
-        { type:'fill', q:'Pilih kata yang tepat untuk melengkapi kalimat!', sentence:'I eat _____ for breakfast.', bank:['rice','sleep','book','car'], answer:'rice', exp:'"Rice" = nasi. Kita makan nasi untuk sarapan.' },
-        { type:'drag', q:'Pasangkan gambar makanan/minuman ke kategorinya!', items:[{id:'a',label:'🍎 Apple', zone:'fruit'},{id:'b',label:'🥛 Milk', zone:'drink'},{id:'c',label:'🍊 Orange', zone:'fruit'},{id:'d',label:'🧃 Juice', zone:'drink'}], zones:[{id:'fruit', label:'🍏 Fruit'},{id:'drink', label:'🥤 Drink'}], exp:'Apple & Orange = fruit. Milk & Juice = drink.' },
-        { type:'mc', q:'What is "jeruk" in English?', img:'🍊', choices:['Lemon','Orange','Grape','Lime'], answer:1, exp:'"Orange" = jeruk.' },
-        { type:'voice', q:'Say this sentence out loud!', target:'I like apple juice', exp:'"I like apple juice" = Saya suka jus apel.' },
-        { type:'fill', q:'Isi titik-titik!', sentence:'She drinks _____ every morning.', bank:['milk','stone','chair','window'], answer:'milk', exp:'"Milk" = susu. Diminum setiap pagi.' },
-        { type:'drag', q:'Kelompokkan makanan & minuman!', items:[{id:'a',label:'🍗 Chicken', zone:'food'},{id:'b',label:'💧 Water', zone:'drink'},{id:'c',label:'🍞 Bread', zone:'food'},{id:'d',label:'🧋 Tea', zone:'drink'}], zones:[{id:'food', label:'🍽️ Food'},{id:'drink', label:'🥤 Drink'}], exp:'Chicken & Bread = food. Water & Tea = drink.' },
-        { type:'mc', q:'What is "ayam goreng" in English?', img:'🍗', choices:['Grilled Fish','Fried Chicken','Boiled Egg','Steamed Shrimp'], answer:1, exp:'"Fried Chicken" = ayam goreng.' },
-        { type:'voice', q:'Baca kalimat ini dengan suara keras!', target:'I drink milk every day', exp:'"I drink milk every day" = Saya minum susu setiap hari.' }
+        { type:'mc', q:'What is this food called in English?', img:'assets/image/3-Apel.png', choices:['Apple','Banana','Mango','Orange'], answer:0, exp:'"Apple" = buah apel.' },
+        { type:'mc', q:'Which one is a DRINK?', img:'assets/image/3-Minuman.png', choices:['🍚 Rice','🥛 Milk','🍞 Bread','🥕 Carrot'], answer:1, exp:'"Milk" (susu) adalah minuman.' },
+        { type:'fill', q:'Pilih kata yang tepat untuk melengkapi kalimat!', img:'assets/image/3-Nasi.png', sentence:'I eat _____ for breakfast.', bank:['rice','sleep','book','car'], answer:'rice', exp:'"Rice" = nasi. Kita makan nasi untuk sarapan.' },
+        { type:'drag', q:'Pasangkan gambar makanan/minuman ke kategorinya!', img:'assets/image/3-Buah.png', items:[{id:'a',label:'🍎 Apple', zone:'fruit'},{id:'b',label:'🥛 Milk', zone:'drink'},{id:'c',label:'🍊 Orange', zone:'fruit'},{id:'d',label:'🧃 Juice', zone:'drink'}], zones:[{id:'fruit', label:'🍏 Fruit'},{id:'drink', label:'🥤 Drink'}], exp:'Apple & Orange = fruit. Milk & Juice = drink.' },
+        { type:'mc', q:'What is "jeruk" in English?', img:'assets/image/3-Jeruk.png', choices:['Lemon','Orange','Grape','Lime'], answer:1, exp:'"Orange" = jeruk.' },
+        { type:'voice', q:'Say this sentence out loud!', img:'assets/image/3-Jus.png', target:'I like apple juice', exp:'"I like apple juice" = Saya suka jus apel.' },
+        { type:'fill', q:'Isi titik-titik!', img:'assets/image/3-Susu.png', sentence:'She drinks _____ every morning.', bank:['milk','stone','chair','window'], answer:'milk', exp:'"Milk" = susu. Diminum setiap pagi.' },
+        { type:'drag', q:'Kelompokkan makanan & minuman!', img:'assets/image/3-AlatMakan.png', items:[{id:'a',label:'🍗 Chicken', zone:'food'},{id:'b',label:'💧 Water', zone:'drink'},{id:'c',label:'🍞 Bread', zone:'food'},{id:'d',label:'🧋 Tea', zone:'drink'}], zones:[{id:'food', label:'🍽️ Food'},{id:'drink', label:'🥤 Drink'}], exp:'Chicken & Bread = food. Water & Tea = drink.' },
+        { type:'mc', q:'What is "ayam goreng" in English?', img:'assets/image/3-Ayam.png', choices:['Grilled Fish','Fried Chicken','Boiled Egg','Steamed Shrimp'], answer:1, exp:'"Fried Chicken" = ayam goreng.' },
+        { type:'voice', q:'Baca kalimat ini dengan suara keras!', img:'assets/image/3-Susu.png', target:'I drink milk every day', exp:'"I drink milk every day" = Saya minum susu setiap hari.' }
       ]
     },
     {
