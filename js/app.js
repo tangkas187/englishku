@@ -1,3 +1,18 @@
+const bgMusic = new Audio('assets/music/bgm.mp3');
+bgMusic.loop = true;
+bgMusic.volume = 0.1; 
+
+const muteBtn = document.createElement('button');
+muteBtn.innerHTML = '🔊';
+muteBtn.style.cssText = 'position:fixed; bottom:20px; left:20px; z-index:9999; font-size:1.5rem; background:#fff; border:2px solid #E2D9CE; border-radius:50%; width:50px; height:50px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center;';
+muteBtn.onclick = () => {
+  bgMusic.muted = !bgMusic.muted;
+  muteBtn.innerHTML = bgMusic.muted ? '🔇' : '🔊';
+};
+document.body.appendChild(muteBtn);
+
+// ===== APP CONTROLLER =====
+
 // ===== APP CONTROLLER =====
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -43,7 +58,6 @@ function renderTopics(){
     card.className='topic-card';
     card.style.setProperty('--tc',t.color);
     card.style.animationDelay=(i*.07)+'s';
-    // FIXED: innerHTML typo
     card.innerHTML=`${done?'<span class="topic-done">✓ Lulus</span>':''}<span class="t-icon">${t.icon}</span><div class="t-name">${t.name}</div><div class="t-count">${t.questions.length} soal</div>${saved?`<div class="t-best">Best: ${saved.highScore}/${saved.maxScore} pts</div>`:''}`;
     card.addEventListener('click',()=>{ AudioFX.click(); startQuiz(t); });
     grid.appendChild(card);

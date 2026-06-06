@@ -35,9 +35,41 @@ function typeLabel(t){
   const cls={mc:'q-type-mc',fill:'q-type-fill',drag:'q-type-drag',voice:'q-type-voice',match:'q-type-match'};
   return `<span class="q-type-badge ${cls[t]||''}">${map[t]||t}</span>`;
 }
-function promptBox(q,num){
-  return `<div class="q-prompt"> ${typeLabel(q.type)} <span class="q-num">Soal ${num}</span> <div class="q-text">${q.q}</div> ${q.img?`<div class="q-img">${q.img}</div>`:''} </div>`;
+
+function promptBox(q, num) {
+  let imgHtml = '';
+  if (q.img) {
+    if (q.img.includes('assets/image/')) {
+      imgHtml = `<div class="q-img"><img id="qImgEl_${num}" src="" style="display:none; max-height:150px; border-radius:12px; margin:0 auto; box-shadow:0 4px 10px rgba(0,0,0,0.1);"></div>`;
+      compressAndShow(q.img, `qImgEl_${num}`);
+    } else {
+      imgHtml = `<div class="q-img">${q.img}</div>`;
+    }
+  }
+  return `<div class="q-prompt"> ${typeLabel(q.type)} <span class="q-num">Soal ${num}</span> <div class="q-text">${q.q}</div> ${imgHtml} </div>`;
 }
+
+function compressAndShow(url, imgId) {
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const scale = Math.min(1, 400 / img.width);
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+    // Kompresi ke JPEG 50%
+    const compressedData = canvas.toDataURL('image/jpeg', 0.5);
+    const imgEl = document.getElementById(imgId);
+    if (imgEl) {
+      imgEl.src = compressedData;
+      imgEl.style.display = 'block';
+    }
+  };
+  img.src = url;
+}
+
 function showFeedback(correct,q){
   if(correct){ Q.score+=10; AudioFX.correct(); }
   else { AudioFX.wrong(); }
@@ -86,18 +118,25 @@ function pickWord(w,el){
 }
 
 /* ── DRAG & DROP ── */
-let dragState={dragging:null, answers:{}};
-function renderDrag(q,num){
-  dragState={dragging:null, answers:{}};
-  const c=document.getElementById('qContainer');
-  // FIXED: Removed innerHTM L typo
-  c.innerHTML=promptBox(q,num)+`<div class="drag-section"><div class="drag-label">✋ Drag item ke kotak yang sesuai:</div><div class="drag-items" id="dragPool">${shuffle(q.items).map(it=>`<div class="drag-chip" id="chip_${it.id}" draggable="true" ondragstart="onDragStart('${it.id}')" ondragend="onDragEnd()" ontouchstart="touchStart(event,'${it.id}')" ontouchmove="touchMove(event)" ontouchend="touchEnd(event,'${it.id}')"><span class="drag-chip-icon">${it.label.split(' ')[0]}</span><span>${it.label.split(' ').slice(1).join(' ')}</span></div>`).join('')}</div></div><div class="drop-zones" id="dropZones">${q.zones.map(z=>`<div class="drop-zone" id="zone_${z.id}" ondragover="onDragOver(event)" ondrop="onDrop(event,'${z.id}')" ondragleave="onDragLeave(event)"><div class="dz-label">${z.label}</div><div class="dz-content" id="zc_${z.id}"></div><div class="dz-placeholder" id="zp_${z.id}">Taruh di sini</div></div>`).join('')}</div><button class="btn-primary drag-submit" onclick="checkDrag()">Cek Jawaban ✓</button>`;
+let dragState = { dragging: null, answers: {} };
+
+function renderDrag(q, num) {
+  dragState = { dragging: null, answers: {} };
+  q.zones.forEach(z => dragState.answers[z.id] = []);
+
+  const c = document.getElementById('qContainer');
+  c.innerHTML = promptBox(q, num) + `<div class="drag-section"><div class="drag-label">✋ Drag item ke kotak yang sesuai:</div><div class="drag-items" id="dragPool">${shuffle(q.items).map(it=>`<div class="drag-chip" id="chip_${it.id}" draggable="true" ondragstart="onDragStart('${it.id}')" ondragend="onDragEnd()" ontouchstart="touchStart(event,'${it.id}')" ontouchmove="touchMove(event)" ontouchend="touchEnd(event,'${it.id}')"><span class="drag-chip-icon">${it.label.split(' ')[0]}</span><span>${it.label.split(' ').slice(1).join(' ')}</span></div>`).join('')}</div></div><div class="drop-zones" id="dropZones">${q.zones.map(z=>`<div class="drop-zone" id="zone_${z.id}" ondragover="onDragOver(event)" ondrop="onDrop(event,'${z.id}')" ondragleave="onDragLeave(event)"><div class="dz-label">${z.label}</div><div class="dz-content" id="zc_${z.id}" style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;"></div><div class="dz-placeholder" id="zp_${z.id}">Taruh di sini</div></div>`).join('')}</div>
+  <div style="display:flex; gap:10px; margin-top:1.2rem; width:100%;">
+    <button class="btn-secondary" onclick="resetDrag()" style="flex:1;">Ulangi 🔄</button>
+    <button class="btn-primary drag-submit" onclick="checkDrag()" style="flex:2;">Cek Jawaban ✓</button>
+  </div>`;
 }
-function onDragStart(id){ dragState.dragging=id; document.getElementById('chip_'+id).classList.add('dragging'); AudioFX.tick(); }
-function onDragEnd(){ if(dragState.dragging) document.getElementById('chip_'+dragState.dragging)?.classList.remove('dragging'); }
-function onDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('over'); }
-function onDragLeave(e){ e.currentTarget.classList.remove('over'); }
-function onDrop(e,zoneId){ e.preventDefault(); e.currentTarget.classList.remove('over'); if(!dragState.dragging) return; placeChip(dragState.dragging, zoneId); dragState.dragging=null; }
+
+function onDragStart(id) { dragState.dragging = id; document.getElementById('chip_' + id).classList.add('dragging'); AudioFX.tick(); }
+function onDragEnd() { if (dragState.dragging) document.getElementById('chip_' + dragState.dragging)?.classList.remove('dragging'); }
+function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('over'); }
+function onDragLeave(e) { e.currentTarget.classList.remove('over'); }
+function onDrop(e, zoneId) { e.preventDefault(); e.currentTarget.classList.remove('over'); if (!dragState.dragging) return; placeChip(dragState.dragging, zoneId); dragState.dragging = null; }
 
 let touchItem=null, touchClone=null;
 function touchStart(e,id){ 
@@ -116,18 +155,82 @@ function touchEnd(e,id){
   touchClone?.remove(); touchClone=null; touchItem=null; 
 }
 
-function placeChip(chipId, zoneId){
-  const chip=document.getElementById('chip_'+chipId); if(!chip) return;
-  Object.keys(dragState.answers).forEach(z=>{ if(dragState.answers[z]===chipId){ delete dragState.answers[z]; document.getElementById('zc_'+z).textContent=''; document.getElementById('zp_'+z).style.display=''; document.getElementById('zone_'+z).classList.remove('filled'); }});
-  dragState.answers[zoneId]=chipId;
-  const zc=document.getElementById('zc_'+zoneId), zp=document.getElementById('zp_'+zoneId);
-  if(zc&&zp){ zc.textContent=chip.textContent.trim(); zp.style.display='none'; document.getElementById('zone_'+zoneId).classList.add('filled'); }
-  chip.style.opacity='.25'; chip.style.pointerEvents='none';
+function placeChip(chipId, zoneId) {
+  const chip = document.getElementById('chip_' + chipId);
+  if (!chip) return;
+
+  Object.keys(dragState.answers).forEach(z => {
+    const arr = dragState.answers[z];
+    const idx = arr.indexOf(chipId);
+    if (idx !== -1) {
+      arr.splice(idx, 1);
+      updateZoneUI(z);
+    }
+  });
+
+  if (dragState.answers[zoneId]) {
+    dragState.answers[zoneId].push(chipId);
+    updateZoneUI(zoneId);
+  }
+
+  chip.style.opacity = '.25';
+  chip.style.pointerEvents = 'none';
 }
-function checkDrag(){
-  const q=Q.questions[Q.idx]; let correct=true;
-  q.items.forEach(it=>{ const zoneEl=document.getElementById('zone_'+it.zone); const given=dragState.answers[it.zone]; if(given===it.id){ zoneEl?.classList.add('correct-dz'); } else { zoneEl?.classList.add('wrong-dz'); correct=false; }});
-  document.querySelector('.drag-submit').disabled=true; showFeedback(correct,q);
+
+function updateZoneUI(zoneId) {
+  const zc = document.getElementById('zc_' + zoneId);
+  const zp = document.getElementById('zp_' + zoneId);
+  if (!zc || !zp) return;
+
+  const chipsInZone = dragState.answers[zoneId];
+  if (chipsInZone.length > 0) {
+    zp.style.display = 'none';
+    document.getElementById('zone_' + zoneId).classList.add('filled');
+    zc.innerHTML = chipsInZone.map(id => {
+      const c = document.getElementById('chip_' + id);
+      return c ? `<div style="font-size:0.8rem; background:#fff; padding:3px 7px; border-radius:6px; border:1px solid #ccc;">${c.textContent.trim()}</div>` : '';
+    }).join('');
+  } else {
+    zp.style.display = '';
+    zc.innerHTML = '';
+    document.getElementById('zone_' + zoneId).classList.remove('filled');
+  }
+}
+
+function checkDrag() {
+  const q = Q.questions[Q.idx];
+  let correct = true;
+
+  q.zones.forEach(z => {
+    const zel = document.getElementById('zone_' + z.id);
+    const expectedItems = q.items.filter(i => i.zone === z.id).map(i => i.id);
+    const actualItems = dragState.answers[z.id] || [];
+    const isZonePerfect = expectedItems.length === actualItems.length && expectedItems.every(id => actualItems.includes(id));
+
+    if (zel) {
+      zel.classList.remove('correct-dz', 'wrong-dz');
+      zel.classList.add(isZonePerfect ? 'correct-dz' : 'wrong-dz');
+    }
+    if (!isZonePerfect) correct = false;
+  });
+
+  document.querySelector('.drag-submit').disabled = true;
+  showFeedback(correct, q);
+}
+
+function resetDrag() {
+  Object.keys(dragState.answers).forEach(z => {
+    dragState.answers[z].forEach(chipId => {
+      const chip = document.getElementById('chip_' + chipId);
+      if (chip) {
+        chip.style.opacity = '1';
+        chip.style.pointerEvents = 'auto';
+        document.getElementById('dragPool').appendChild(chip);
+      }
+    });
+    dragState.answers[z] = [];
+    updateZoneUI(z);
+  });
 }
 
 /* ── VOICE / SPEECH ── */
@@ -159,7 +262,6 @@ function renderVoice(q,num){
 
 function toggleRecord(){
   if(isRecording){ stopRecord(); return; }
-  // Reset previous result
   const resEl=document.getElementById('voiceResult');
   if(resEl){ resEl.textContent='Mendengarkan...'; resEl.className='voice-transcript'; }
   const playBtn=document.getElementById('voicePlayBtn');
@@ -196,7 +298,6 @@ function toggleRecord(){
   const hint=document.getElementById('voiceHint');
   if(hint) hint.textContent='🔴 Sedang merekam... Tekan ⏹️ untuk berhenti';
   AudioFX.tick();
-  // Also capture audio for playback via MediaRecorder
   _startMediaRecorder();
 }
 
@@ -215,7 +316,7 @@ function _startMediaRecorder(){
       if(playBtn) playBtn.disabled=false;
     };
     voiceMediaRecorder.start();
-  }).catch(()=>{}); // silently skip if no mic permission for MediaRecorder (SR still works)
+  }).catch(()=>{}); 
 }
 
 function stopRecord(){
@@ -243,7 +344,6 @@ function playbackVoice(){
 }
 
 function resetVoice(){
-  // Stop any ongoing recording
   if(isRecording){ if(voiceRecognition) try{voiceRecognition.stop();}catch(e){} if(voiceMediaRecorder&&voiceMediaRecorder.state==='recording') try{voiceMediaRecorder.stop();}catch(e){} isRecording=false; stopVoiceWaveform(); }
   voiceTranscript='';
   if(voiceAudioURL){ URL.revokeObjectURL(voiceAudioURL); voiceAudioURL=null; }
@@ -268,12 +368,10 @@ function checkVoice(){
   const target=q.target.toLowerCase().replace(/[^a-z\s]/g,'').trim();
   const said=(voiceTranscript||'').toLowerCase().replace(/[^a-z\s]/g,'').trim();
 
-  // Stricter scoring: require ≥75% key words AND penalize if said is totally different
-  const tWords=target.split(/\s+/).filter(w=>w.length>2); // only meaningful words (len>2)
+  const tWords=target.split(/\s+/).filter(w=>w.length>2);
   const sWords=said.split(/\s+/);
   const matched=tWords.filter(w=>sWords.some(sw=>sw===w||sw.startsWith(w.slice(0,-1)))).length;
   const score=tWords.length>0 ? matched/tWords.length : 0;
-  // Also do a loose full-string similarity check
   const correct= score>=0.75;
 
   const chkEl=document.getElementById('voiceCheck');
@@ -292,98 +390,117 @@ function checkVoice(){
 function skipVoice(){ const q=Q.questions[Q.idx]; showFeedback(false,{...q,exp:'Soal dilewati. '+q.exp}); }
 
 /* ── MATCH PAIRS ── */
-let matchState={selected:null, side:null, matched:[], wrong:[]};
-function renderMatch(q,num){
-  matchState={selected:null,side:null,matched:[],wrong:[]};
-  const leftShuffled=shuffle(q.pairs.map(p=>p.left));
-  const rightShuffled=shuffle(q.pairs.map(p=>p.right));
-  const c=document.getElementById('qContainer');
-  c.innerHTML=promptBox(q,num)+`
+let matchState = { selected: null, side: null, val: null, pairs: [], colors: ['#FFCDD2', '#C8E6C9', '#BBDEFB', '#FFF9C4', '#E1BEE7', '#FFECB3'] };
+
+function renderMatch(q, num) {
+  matchState = { selected: null, side: null, val: null, pairs: [], colors: ['#FFCDD2', '#C8E6C9', '#BBDEFB', '#FFF9C4', '#E1BEE7', '#FFECB3'] };
+  const leftShuffled = shuffle(q.pairs.map(p => p.left));
+  const rightShuffled = shuffle(q.pairs.map(p => p.right));
+  const c = document.getElementById('qContainer');
+  
+  c.innerHTML = promptBox(q, num) + `
     <div class="match-grid">
       <div>
         <div class="match-col-hdr">Kolom A</div>
         <div class="match-col" id="matchLeft">
-          ${leftShuffled.map((l,i)=>`<div class="match-item" id="ml_${i}" data-side="left" data-idx="${i}" data-val="${encodeURIComponent(l)}">${l}</div>`).join('')}
+          ${leftShuffled.map((l, i) => `<div class="match-item" id="ml_${i}" data-side="left" data-idx="${i}" data-val="${encodeURIComponent(l)}">${l}</div>`).join('')}
         </div>
       </div>
       <div>
         <div class="match-col-hdr">Kolom B</div>
         <div class="match-col" id="matchRight">
-          ${rightShuffled.map((r,i)=>`<div class="match-item" id="mr_${i}" data-side="right" data-idx="${i}" data-val="${encodeURIComponent(r)}">${r}</div>`).join('')}
+          ${rightShuffled.map((r, i) => `<div class="match-item" id="mr_${i}" data-side="right" data-idx="${i}" data-val="${encodeURIComponent(r)}">${r}</div>`).join('')}
         </div>
       </div>
     </div>
-    <div class="match-hint" id="matchHint" style="text-align:center;font-size:.82rem;color:var(--text-m,#888);margin-top:.5rem">Pilih satu item di Kolom A, lalu satu item di Kolom B</div>
+    <div class="match-hint" id="matchHint" style="text-align:center;font-size:.82rem;color:var(--text-m,#888);margin-top:.5rem">Pilih satu item di Kolom A, lalu pasangkan ke Kolom B (klik warna yang sama jika ingin membatalkan)</div>
+    <button class="btn-primary" id="matchSubmit" onclick="checkMatch()" style="width:100%; margin-top:1rem;" disabled>Cek Jawaban ✓</button>
   `;
-  window._matchPairs=q.pairs;
-  // Use event delegation on the container
-  c.querySelectorAll('.match-item').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const side=el.dataset.side;
-      const idx=parseInt(el.dataset.idx);
-      const val=decodeURIComponent(el.dataset.val);
-      handleMatchClick(side,idx,val,q);
+  
+  window._matchPairs = q.pairs;
+  c.querySelectorAll('.match-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const side = el.dataset.side;
+      const idx = parseInt(el.dataset.idx);
+      const val = decodeURIComponent(el.dataset.val);
+      handleMatchClick(side, idx, val, q);
     });
   });
 }
 
-function handleMatchClick(side,idx,val,q){
-  const elId=(side==='left'?'ml':'mr')+'_'+idx;
-  const el=document.getElementById(elId);
-  if(!el||el.classList.contains('matched')) return;
+function handleMatchClick(side, idx, val, q) {
+  const elId = (side === 'left' ? 'ml' : 'mr') + '_' + idx;
+  const el = document.getElementById(elId);
+
+  if (el.classList.contains('paired')) {
+    unpairMatch(elId);
+    return;
+  }
+
   AudioFX.tick();
 
-  const hint=document.getElementById('matchHint');
-
-  if(matchState.side===null){
-    // Nothing selected yet — select this
-    matchState.selected=idx; matchState.side=side; matchState.val=val;
+  if (matchState.side === null) {
+    matchState.selected = idx; matchState.side = side; matchState.val = val;
     el.classList.add('selected');
-    if(hint) hint.textContent=side==='left'
-      ? `✅ "${val}" dipilih. Sekarang pilih pasangannya di Kolom B`
-      : `✅ "${val}" dipilih. Sekarang pilih pasangannya di Kolom A`;
-  } else if(matchState.side===side){
-    // Same column — switch selection
-    document.querySelectorAll('.match-item.selected').forEach(e=>e.classList.remove('selected'));
-    matchState.selected=idx; matchState.side=side; matchState.val=val;
+  } else if (matchState.side === side) {
+    document.querySelectorAll('.match-item.selected').forEach(e => e.classList.remove('selected'));
+    matchState.selected = idx; matchState.side = side; matchState.val = val;
     el.classList.add('selected');
-    if(hint) hint.textContent=`✅ "${val}" dipilih. Sekarang pilih pasangannya di kolom sebelah`;
   } else {
-    // Different column — try to match
-    const leftVal=side==='right'?matchState.val:val;
-    const rightVal=side==='right'?val:matchState.val;
-    const leftIdx=side==='right'?matchState.selected:idx;
-    const rightIdx=side==='right'?idx:matchState.selected;
-    const mlEl=document.getElementById('ml_'+leftIdx);
-    const mrEl=document.getElementById('mr_'+rightIdx);
+    const leftVal = side === 'right' ? matchState.val : val;
+    const rightVal = side === 'right' ? val : matchState.val;
+    const leftId = side === 'right' ? 'ml_' + matchState.selected : elId;
+    const rightId = side === 'right' ? elId : 'mr_' + matchState.selected;
 
-    const correct=window._matchPairs.some(p=>p.left===leftVal && p.right===rightVal);
+    const color = matchState.colors[matchState.pairs.length % matchState.colors.length];
+    matchState.pairs.push({ leftVal, rightVal, leftId, rightId });
 
-    // Clear selection state first
-    matchState.selected=null; matchState.side=null; matchState.val=null;
-    document.querySelectorAll('.match-item.selected').forEach(e=>e.classList.remove('selected'));
+    const mlEl = document.getElementById(leftId);
+    const mrEl = document.getElementById(rightId);
+    mlEl.classList.remove('selected'); mrEl.classList.remove('selected');
+    mlEl.classList.add('paired'); mrEl.classList.add('paired');
+    mlEl.style.backgroundColor = color; mrEl.style.backgroundColor = color;
+    mlEl.dataset.pairId = matchState.pairs.length - 1;
+    mrEl.dataset.pairId = matchState.pairs.length - 1;
 
-    if(correct){
-      mlEl?.classList.add('matched');
-      mrEl?.classList.add('matched');
-      matchState.matched.push(leftVal);
-      AudioFX.correct();
-      const remaining=window._matchPairs.length - matchState.matched.length;
-      if(hint) hint.textContent=remaining>0 ? `✅ Benar! Sisa ${remaining} pasangan lagi` : '🎉 Semua terpasang!';
-      if(matchState.matched.length===window._matchPairs.length){
-        setTimeout(()=>showFeedback(true,q),400);
-      }
-    } else {
-      mlEl?.classList.add('wrong-m');
-      mrEl?.classList.add('wrong-m');
-      AudioFX.wrong();
-      if(hint) hint.textContent=`❌ Bukan pasangan yang benar. Coba lagi!`;
-      setTimeout(()=>{
-        mlEl?.classList.remove('wrong-m');
-        mrEl?.classList.remove('wrong-m');
-      },600);
+    matchState.selected = null; matchState.side = null; matchState.val = null;
+
+    if (matchState.pairs.length === window._matchPairs.length) {
+      document.getElementById('matchSubmit').disabled = false;
     }
   }
+}
+
+function unpairMatch(elId) {
+  const el = document.getElementById(elId);
+  const pairIdx = el.dataset.pairId;
+  const pair = matchState.pairs[pairIdx];
+  if (!pair) return;
+
+  const mlEl = document.getElementById(pair.leftId);
+  const mrEl = document.getElementById(pair.rightId);
+  if (mlEl) { mlEl.classList.remove('paired'); mlEl.style.backgroundColor = ''; delete mlEl.dataset.pairId; }
+  if (mrEl) { mrEl.classList.remove('paired'); mrEl.style.backgroundColor = ''; delete mrEl.dataset.pairId; }
+
+  matchState.pairs.splice(pairIdx, 1);
+  matchState.pairs.forEach((p, i) => {
+    document.getElementById(p.leftId).dataset.pairId = i;
+    document.getElementById(p.rightId).dataset.pairId = i;
+  });
+  document.getElementById('matchSubmit').disabled = true;
+}
+
+function checkMatch() {
+  const q = Q.questions[Q.idx];
+  let correct = true;
+  matchState.pairs.forEach(p => {
+    const isMatch = window._matchPairs.some(mp => mp.left === p.leftVal && mp.right === p.rightVal);
+    if (!isMatch) correct = false;
+  });
+  
+  document.getElementById('matchSubmit').disabled = true;
+  document.querySelectorAll('.match-item').forEach(el => el.style.pointerEvents = 'none');
+  showFeedback(correct, q);
 }
 
 /* ── next / finish ── */

@@ -934,3 +934,61 @@ body {
   display: flex; align-items: flex-start; gap: .5rem;
   text-align: left;
 }
+/* ── DRAG: chips inside drop zones ── */
+.dz-chip {
+  display: inline-flex; align-items: center;
+  background: var(--teal-l);
+  border: 1.5px solid var(--teal);
+  border-radius: 8px;
+  padding: .25rem .6rem;
+  font-size: .8rem; font-weight: 800;
+  color: var(--teal-d);
+  margin: .2rem; cursor: pointer;
+  transition: all .15s;
+}
+.dz-chip:hover {
+  background: var(--red-l); border-color: var(--red);
+  color: var(--red);
+}
+.dz-chip:hover::after { content: ' ✕'; font-size: .7rem; }
+
+/* ── MATCH: hint text ── */
+.match-hint {
+  text-align: center;
+  font-size: .85rem; font-weight: 700;
+  color: var(--text-m);
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: .55rem 1rem;
+  margin-bottom: 1rem;
+  transition: all .25s;
+  min-height: 38px;
+}
+
+/* ── IMAGE: compression badge ── */
+.q-img {
+  text-align: center;
+  margin-top: .9rem;
+  font-size: 5rem;
+  line-height: 1;
+}
+.img-compress-badge {
+  font-size: .68rem; font-weight: 700;
+  color: var(--text-m);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: .2rem .6rem;
+  display: inline-block;
+  margin-top: .4rem;
+}
+.img-loading {
+  font-size: .85rem; color: var(--text-m);
+  padding: 1rem; text-align: center;
+}
+.q-img img {
+  display: block; margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}

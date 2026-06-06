@@ -596,7 +596,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Called by app.js when home screen is shown
+// Called by app.js when home screen is shown
 function onHomeShown() {
+  bgMusic.play().catch(e => console.log('Autoplay diblokir browser, butuh interaksi user dulu'));
   injectSessionTimer();
   SecurityManager.startSession();
   refreshTechStats();
