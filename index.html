@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoKids - Learning Journey</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- Memanggil CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Atas -->
+    <header class="top-bar">
+        <div class="headline-md" style="color: var(--primary); font-family: 'Fredoka One', cursive;">🦉 LingoKids</div>
+        <div style="padding: 6px 16px; border-radius: 99px; background: var(--secondary-container); border: 3px solid var(--secondary); color: var(--secondary-dark); display: flex; align-items: center; gap: 6px; font-weight: 900;">
+            <span class="material-icons-round">stars</span>
+            <span id="tbScore">0</span>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <!-- =========================================
+             1. LOGIN SCREEN
+             ========================================= -->
+        <div id="screen-login" class="screen active">
+            <div class="login-bg-custom"></div>
+            
+            <div class="login-emoji-row">
+                <span style="animation-delay: 0s">📚</span><span style="animation-delay: 1.2s">✏️</span>
+                <span style="animation-delay: 2.1s">🌟</span><span style="animation-delay: 0.7s">🎒</span>
+                <span style="animation-delay: 1.8s">🎨</span>
+            </div>
+
+            <div class="login-card">
+                <div class="hero-circle">🦉</div>
+                <h1 style="font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--primary-dark); margin-bottom: 8px;">LingoKids</h1>
+                <p class="label-sm" style="color: var(--on-surface-variant); margin-bottom: 24px;">Worksheet Interaktif Bahasa Inggris SD</p>
+                
+                <div class="form-group" style="text-align: left; margin-bottom: 16px;">
+                    <label class="label-lg" style="color: var(--on-surface); margin-bottom: 8px; display: block;">Nama Kamu</label>
+                    <input type="text" id="inputName" placeholder="Tulis nama kamu..." autocomplete="off">
+                </div>
+
+                <div style="text-align: left; margin-bottom: 24px;">
+                    <label class="label-lg" style="color: var(--on-surface); margin-bottom: 8px; display: block;">Pilih Kelas</label>
+                    <div class="class-selector">
+                        <button class="cls-btn" data-class="3">Kelas 3</button>
+                        <button class="cls-btn" data-class="4">Kelas 4</button>
+                        <button class="cls-btn" data-class="5">Kelas 5</button>
+                        <button class="cls-btn" data-class="6">Kelas 6</button>
+                    </div>
+                </div>
+
+                <button id="btnStart" class="btn btn-primary" disabled>Mulai Belajar! 🚀</button>
+            </div>
+        </div>
+
+        <!-- =========================================
+             2. HOME DASHBOARD
+             ========================================= -->
+        <div id="screen-home" class="screen">
+            <div class="welcome-card-orange">
+                <div class="welcome-text">
+                    <h1 class="headline-xl">Halo, <span id="wcName">Explorer</span>! 👋</h1>
+                    <p class="body-md" style="margin-top: 8px; opacity: 0.9;">Siap belajar Bahasa Inggris hari ini?</p>
+                    <div class="welcome-stats">
+                        <div class="stat-pill"><span class="material-icons-round" style="color: #facc15;">local_fire_department</span><span id="wcStreak">0 Hari</span></div>
+                        <div class="stat-pill"><span class="material-icons-round" style="color: #facc15;">stars</span><span id="wcTotalPtsHome">0 Poin</span></div>
+                    </div>
+                </div>
+                <div style="font-size: 80px; animation: float 3s ease-in-out infinite alternate; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.2));">🦉</div>
+            </div>
+
+            <h3 class="headline-md" style="color: var(--primary-dark); margin-bottom: 20px;">Pick Your Adventure</h3>
+            <div id="topicGrid" class="adventure-grid"></div>
+
+            <h3 class="headline-md" style="color: var(--primary-dark); margin: 40px 0 20px;">Your Learning Journey</h3>
+            <div class="roadmap-container" id="dashRoadmap"></div>
+
+            <div class="bottom-dash-grid">
+                <div class="card" style="margin: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4 class="headline-md" style="font-size: 20px; color: var(--primary-dark);">Class Goal</h4>
+                        <span class="label-lg" style="color: var(--primary);" id="dashGoalPct">0%</span>
+                    </div>
+                    <div class="progress-container" style="height: 16px; margin-bottom: 12px; background: var(--surface-container-high);">
+                        <div class="progress-fill" id="dashGoalBar" style="width: 0%; background: var(--primary);"></div>
+                    </div>
+                    <p class="label-sm" style="color: var(--on-surface-variant);" id="dashGoalText">Loading goal...</p>
+                </div>
+                
+                <div class="card" style="margin: 0; display: flex; align-items: center; gap: 16px;">
+                    <div style="background: var(--secondary-container); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid var(--secondary);">
+                        <span class="material-icons-round" id="dashRewardIcon" style="color: var(--secondary-dark); font-size: 32px;">emoji_events</span>
+                    </div>
+                    <div>
+                        <h4 class="headline-md" style="font-size: 20px; color: var(--secondary-dark);">Next Reward</h4>
+                        <p class="label-sm" style="color: var(--on-surface-variant); margin-top: 4px;" id="dashRewardDesc">Loading reward...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================================
+             3. PROGRESS SCREEN
+             ========================================= -->
+        <div id="screen-progress" class="screen">
+            <div class="dashboard-top-grid">
+                <div class="profile-card">
+                    <div class="avatar-wrapper">
+                        <img src="" alt="Avatar" class="avatar-img" id="progAvatar">
+                        <div class="lv-badge">Lv. 1</div>
+                    </div>
+                    <div style="flex: 1;">
+                        <h2 class="headline-md" id="progGreeting">Great Job!</h2>
+                        <p class="body-md" style="color: var(--on-surface-variant); font-size: 14px; margin: 8px 0 16px;">You've completed <span id="progPctText" style="font-weight: 900; color: var(--primary-dark);">0%</span> of your Quests.</p>
+                        <div class="progress-container" style="height: 16px;">
+                            <div class="progress-fill" id="progBarFill" style="width: 0%; background: var(--primary);"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card streak-card">
+                    <span class="material-icons-round" style="font-size: 48px; margin-bottom: 8px;">local_fire_department</span>
+                    <h2 class="headline-xl">12</h2>
+                    <p class="label-sm">Day Streak</p>
+                </div>
+                <div class="stat-card stars-card">
+                    <span class="material-icons-round" style="font-size: 48px; margin-bottom: 8px;">stars</span>
+                    <h2 class="headline-xl" id="progTotalStars">0</h2>
+                    <p class="label-sm">Total Stars</p>
+                </div>
+            </div>
+
+            <div class="dashboard-mid-grid">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 class="headline-md" style="display: flex; align-items: center; gap: 8px; color: var(--primary-dark);">
+                            <span class="material-icons-round">emoji_events</span> Achievement Gallery
+                        </h3>
+                    </div>
+                    <div class="achievements-grid">
+                        <div class="achievement-card"><div class="achievement-icon" style="background: var(--primary-container); color: white;"><span class="material-icons-round">menu_book</span></div><h4 class="label-lg">Grammar</h4><p class="label-sm">1 Perfect</p></div>
+                        <div class="achievement-card"><div class="achievement-icon" style="background: var(--secondary); color: white;"><span class="material-icons-round">bolt</span></div><h4 class="label-lg">Fast</h4><p class="label-sm">100 Stars</p></div>
+                        <div class="achievement-card"><div class="achievement-icon" style="background: var(--tertiary); color: white;"><span class="material-icons-round">chrome_reader_mode</span></div><h4 class="label-lg">Master</h4><p class="label-sm">2 Passed</p></div>
+                        <div class="achievement-card locked"><div class="achievement-icon" style="background: var(--surface-container-high);"><span class="material-icons-round">lock</span></div><h4 class="label-lg">Voyager</h4><p class="label-sm">Play 5x</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="headline-md" style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; color: var(--secondary-dark);">
+                        <span class="material-icons-round">leaderboard</span> Top Explorers
+                    </h3>
+                    <div class="lb-card">
+                        <div id="progLeaderboardList"></div>
+                        <button class="btn" id="toggleRankBtn" style="background: var(--surface-container-low); color: var(--primary-dark); font-size: 15px; border-radius: 0; min-height: 56px; width: 100%;">Show My Full Rank</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================================
+             4. QUIZ SCREEN
+             ========================================= -->
+        <div id="screen-quiz" class="screen">
+            <button class="btn btn-outline" style="width: auto; margin-bottom: 20px; font-size: 15px; padding: 10px 20px; min-height: auto;" onclick="backToHome()">
+                <span class="material-icons-round" style="font-size: 18px;">arrow_back</span> Kembali
+            </button>
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; color: var(--on-surface-variant);">
+                    <span class="label-lg" id="quizTitle" style="color: var(--primary-dark);">Topic</span>
+                    <span class="label-lg" style="background: var(--surface-container-high); padding: 4px 12px; border-radius: 8px;">Soal <span id="qNum">1</span> / <span id="qTot">10</span></span>
+                </div>
+                <div id="qContainer"></div>
+            </div>
+        </div>
+
+        <!-- =========================================
+             5. RESULT SCREEN
+             ========================================= -->
+        <div id="screen-result" class="screen">
+            <div class="card" style="text-align: center;">
+                <div id="resEmoji" style="font-size: 80px; margin-bottom: 16px;">🏆</div>
+                <h2 class="headline-xl" id="resTitle" style="color: var(--primary-dark);">Luar Biasa!</h2>
+                <p class="body-lg" style="margin: 16px 0; color: var(--on-surface-variant);" id="resMsg">Nilai sempurna!</p>
+                <div style="background: var(--secondary-container); border: 3px solid var(--secondary); padding: 24px; border-radius: var(--radius-xl); margin-bottom: 32px;">
+                    <span id="resPts" style="font-family: 'Fredoka One', cursive; font-size: 64px; color: var(--secondary-dark);">100</span>
+                    <div style="font-weight: 800; color: var(--secondary-dark);">DARI <span id="resMax">100</span></div>
+                    <div id="resStars" style="font-size: 32px; letter-spacing: 4px; margin-top: 12px;">⭐⭐⭐</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <button class="btn btn-outline" onclick="retryQuiz()">Ulangi</button>
+                    <button class="btn btn-primary" onclick="backToHome()">Selesai ✅</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Feedback Overlay -->
+    <div id="feedbackOverlay" class="feedback-overlay">
+        <h3 class="headline-xl" style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
+            <span id="fbIcon">✅</span> <span id="fbMsg">Benar!</span>
+        </h3>
+        <p class="body-lg" id="fbExp" style="margin: 8px 0 24px; color: var(--on-surface-variant);"></p>
+        <button class="btn btn-primary" onclick="nextQuestion()">Lanjut ➡️</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="backToHome()">
+            <span class="material-icons-round">home</span><span>Home</span>
+        </div>
+        
+        <div class="nav-item" onclick="goToProgress()">
+            <span class="material-icons-round">emoji_events</span><span>Progress</span>
+        </div>
+        
+        <div class="nav-item" onclick="logout()">
+            <span class="material-icons-round">logout</span><span>Keluar</span>
+        </div>
+    </nav>
+
+    <!-- Scripts dari folder JS -->
+    <script src="js/storage.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/multimedia.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
