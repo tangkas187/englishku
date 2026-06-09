@@ -1,104 +1,120 @@
-// ===== STORAGE MODULE (Keamanan: Enkripsi data skor) =====
-const STORAGE_KEY = 'englishku_v2';
-// Simple XOR-based obfuscation
+// ===== STORAGE MODULE (Multi-User & Leaderboard Edition) =====
+const STORAGE_KEY = 'lingokids_db'; // Menggunakan key baru agar bersih dari error lama
+
+// Sistem Keamanan: XOR-based obfuscation
 function encode(str) {
-  const key = 'EnglishKu2024';
-  let result = '';
-  for (let i = 0; i < str.length; i++) {
-    result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-  }
-  return btoa(result);
-}
-function decode(encoded) {
-  try {
-    const str = atob(encoded);
-    const key = 'EnglishKu2024';
+    const key = 'LingoKids2024';
     let result = '';
     for (let i = 0; i < str.length; i++) {
-      result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
     }
-    return result;
-  } catch (e) { return null; }
+    return btoa(result);
 }
-// Compress score data using run-length-like encoding
-// FIXED: Removed spaces inside regex which caused matching failure
-function compressData(obj) {
-  const json = JSON.stringify(obj);
-  const compressed = json
-    .replace(/"score":0/g, '"s":0')
-    .replace(/"score":/g, '"s":')
-    .replace(/"attempts":0/g, '"a":0')
-    .replace(/"attempts":/g, '"a":')
-    .replace(/"completed":false/g, '"c":0')
-    .replace(/"completed":true/g, '"c":1');
-  return compressed;
-}
-function decompressData(str) {
-  const decompressed = str
-    .replace(/"s":0/g, '"score":0')
-    .replace(/"s":/g, '"score":')
-    .replace(/"a":0/g, '"attempts":0')
-    .replace(/"a":/g, '"attempts":')
-    .replace(/"c":0/g, '"completed":false')
-    .replace(/"c":1/g, '"completed":true');
-  return decompressed;
-}
-const Storage = {
-  save(data) {
+
+function decode(encoded) {
     try {
-      const compressed = compressData(data);
-      const encoded = encode(compressed);
-      localStorage.setItem(STORAGE_KEY, encoded);
-      const checksum = this._checksum(compressed);
-      localStorage.setItem(STORAGE_KEY + '_cs', checksum);
-      return true;
-    } catch(e) { console.warn('Storage save failed:', e); return false; }
-  },
-  load() {
-    try {
-      const encoded = localStorage.getItem(STORAGE_KEY);
-      if (!encoded) return null;
-      const decoded = decode(encoded);
-      if (!decoded) return null;
-      
-      const savedChecksum = localStorage.getItem(STORAGE_KEY + '_cs');
-      const currentChecksum = this._checksum(decoded);
-      if (savedChecksum && savedChecksum !== currentChecksum) {
-        console.warn('Data integrity check failed, resetting...');
-        this.clear();
-        return null;
-      }
-      const decompressed = decompressData(decoded);
-      return JSON.parse(decompressed);
-    } catch(e) { console.warn('Storage load failed:', e); return null; }
-  },
-  clear() {
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(STORAGE_KEY + '_cs');
-  },
-  _checksum(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return hash.toString(16);
-  }
+        const str = atob(encoded);
+        const key = 'LingoKids2024';
+        let result = '';
+        for (let i = 0; i < str.length; i++) {
+            result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return result;
+    } catch (e) { return null; }
+}
+
+// Database Structure
+let AppDB = {
+    users: {} // Format: { "Alex": { class: 3, scores: {}, totalPoints: 100 } }
 };
-let AppState = { player: { name: '', class: 3 }, scores: {}, totalPoints: 0 };
+let AppState = { player: { name: '', class: 3 }, scores: {}, totalPoints: 0 }; // Pemain yang sedang aktif
+
+const Storage = {
+    save() {
+        try {
+            // Update skor pemain yang sedang aktif ke dalam Master DB
+            if (AppState.player.name) {
+                AppDB.users[AppState.player.name] = {
+                    class: AppState.player.class,
+                    scores: AppState.scores,
+                    totalPoints: AppState.totalPoints
+                };
+            }
+            const json = JSON.stringify(AppDB);
+            localStorage.setItem(STORAGE_KEY, encode(json));
+        } catch (e) { console.warn('Storage save failed:', e); }
+    },
+    load() {
+        try {
+            const encoded = localStorage.getItem(STORAGE_KEY);
+            if (!encoded) return false;
+            
+            const decoded = decode(encoded);
+            if (decoded) {
+                AppDB = JSON.parse(decoded);
+                if (!AppDB.users) AppDB.users = {};
+                return true;
+            }
+        } catch (e) { console.warn('Storage load failed:', e); }
+        return false;
+    }
+};
+
 function initState() {
-  const saved = Storage.load();
-  if (saved) { AppState = saved; }
+    Storage.load();
 }
-function saveState() { Storage.save(AppState); }
+
+// Fungsi untuk menangani login multi-user & naik kelas
+function loginUser(name, cls) {
+    if (AppDB.users[name]) {
+        // Jika nama sudah ada, muat data lamanya
+        AppState.player = { name: name, class: cls }; 
+        AppState.scores = AppDB.users[name].scores || {};
+        AppState.totalPoints = AppDB.users[name].totalPoints || 0;
+        
+        // Update kelas terbarunya ke dalam Master DB
+        AppDB.users[name].class = cls;
+    } else {
+        // Jika nama belum ada, buat profil baru
+        AppState.player = { name: name, class: cls };
+        AppState.scores = {};
+        AppState.totalPoints = 0;
+    }
+    Storage.save();
+}
+
+function saveState() { Storage.save(); }
+
 function updateScore(topicId, score, maxScore) {
-  const existing = AppState.scores[topicId] || { score: 0, attempts: 0, completed: false, highScore: 0 };
-  const isImprovement = score > existing.highScore;
-  AppState.scores[topicId] = { score, attempts: existing.attempts + 1, completed: score >= Math.floor(maxScore * 0.6), highScore: Math.max(existing.highScore, score), maxScore };
-  AppState.totalPoints = Object.values(AppState.scores).reduce((sum, s) => sum + (s.highScore || 0), 0);
-  saveState();
-  return isImprovement;
+    const existing = AppState.scores[topicId] || { score: 0, attempts: 0, completed: false, highScore: 0 };
+    const isImprovement = score > existing.highScore;
+    
+    AppState.scores[topicId] = { 
+        score, 
+        attempts: existing.attempts + 1, 
+        completed: score >= Math.floor(maxScore * 0.6), 
+        highScore: Math.max(existing.highScore, score), 
+        maxScore 
+    };
+    
+    // Hitung ulang total poin
+    AppState.totalPoints = Object.values(AppState.scores).reduce((sum, s) => sum + (s.highScore || 0), 0);
+    Storage.save(); // Otomatis simpan ke DB setiap selesai kuis
+    return isImprovement;
 }
+
 function getTopicScore(topicId) { return AppState.scores[topicId] || null; }
-function clearCurrentUser() { AppState = { player: { name: '', class: 3 }, scores: {}, totalPoints: 0 }; }
+
+function clearCurrentUser() { 
+    AppState = { player: { name: '', class: 3 }, scores: {}, totalPoints: 0 }; 
+}
+
+// Fungsi mengambil data untuk Leaderboard UI
+function getLeaderboard() {
+    const rankData = [];
+    for (const [name, data] of Object.entries(AppDB.users)) {
+        rankData.push({ name: name, class: data.class, points: data.totalPoints });
+    }
+    // Urutkan dari poin tertinggi ke terendah
+    return rankData.sort((a, b) => b.points - a.points);
+}

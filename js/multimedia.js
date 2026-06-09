@@ -151,14 +151,19 @@ const CompressionEngine = (() => {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const compressed = canvas.toDataURL('image/jpeg', quality);
-        resolve({
+        const result = {
           original: dataURL.length,
           compressed: compressed.length,
+          originalSize: Math.round(dataURL.length * 0.75),
+          compressedSize: Math.round(compressed.length * 0.75),
           ratio: ((1 - compressed.length / dataURL.length) * 100).toFixed(1),
           dataURL: compressed,
           originalW: img.width, originalH: img.height,
           compressedW: canvas.width, compressedH: canvas.height
-        });
+        };
+        // Cache for tech panel & result screen
+        window._lastImgStat = result;
+        resolve(result);
       };
       img.src = dataURL;
     });
@@ -176,26 +181,30 @@ const CompressionEngine = (() => {
     return result;
   }
 
-  // Measure storage compression stats
+  // Storage stats — text data hanya XOR+Base64 (tidak dikompresi, memang bisa lebih besar)
+  // Kompresi utama ada di IMAGE (Canvas JPEG) — itulah yang ditampilkan
   function getStorageStats() {
     const raw = JSON.stringify(AppState || {});
-    const rle = rleEncode(raw);
     const encoded = localStorage.getItem('englishku_v2') || '';
+    // Image compression saving (from last compressed image, cached in _lastImgStat)
+    const imgStat = window._lastImgStat || null;
     return {
       rawBytes: raw.length,
-      rleBytes: rle.length,
       storedBytes: encoded.length,
-      rleSaving: ((1 - rle.length / raw.length) * 100).toFixed(1),
-      totalSaving: encoded.length > 0
-        ? ((1 - encoded.length / raw.length) * 100).toFixed(1)
-        : '0'
+      // Untuk teks: tidak ada kompresi, XOR hanya enkripsi
+      textNote: 'XOR Cipher (enkripsi, bukan kompresi)',
+      // Image compression adalah fitur kompresi utama
+      imgOriginal:    imgStat ? imgStat.originalSize  : null,
+      imgCompressed:  imgStat ? imgStat.compressedSize : null,
+      imgSaving:      imgStat ? imgStat.ratio          : null,
+      imgDims:        imgStat ? `${imgStat.compressedW}×${imgStat.compressedH}px` : null,
     };
   }
 
   // Base64 size estimation
   function base64Size(str) { return Math.ceil((str.length * 3) / 4); }
 
-  return { compressImageDataURL, rleEncode, getStorageStats, base64Size };
+  return { compressImageDataURL, getStorageStats, base64Size };
 })();
 
 /* ─────────────────────────────────────────
@@ -329,22 +338,26 @@ function initTechPanel() {
       </div>
 
       <div class="tech-section" style="margin-top:.9rem">
-        <div class="tech-section-title">📦 Kompresi Data</div>
+        <div class="tech-section-title">📦 Kompresi Gambar (Canvas JPEG)</div>
         <div class="tech-row">
-          <span class="tech-label">Raw JSON</span>
-          <span class="tech-val" id="techRaw">— bytes</span>
+          <span class="tech-label">Original</span>
+          <span class="tech-val" id="techImgOri">Belum ada gambar</span>
         </div>
         <div class="tech-row">
           <span class="tech-label">Setelah Kompresi</span>
-          <span class="tech-val green" id="techComp">— bytes</span>
+          <span class="tech-val green" id="techImgComp">—</span>
         </div>
         <div class="tech-row">
           <span class="tech-label">Penghematan</span>
-          <span class="tech-val orange" id="techSaving">—%</span>
+          <span class="tech-val orange" id="techImgSaving">—</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-label">Resolusi Output</span>
+          <span class="tech-val green" id="techImgDims">—</span>
         </div>
         <div class="tech-row">
           <span class="tech-label">Metode</span>
-          <span class="tech-val green">XOR + Pattern Sub</span>
+          <span class="tech-val green">Canvas toDataURL JPEG</span>
         </div>
       </div>
 
@@ -406,14 +419,23 @@ function refreshTechStats() {
   const drawer = document.getElementById('techDrawer');
   if (!drawer?.classList.contains('open')) return;
 
-  // Compression stats
+  // Image compression stats (from last processed image)
   const stats = CompressionEngine.getStorageStats();
-  const rawEl   = document.getElementById('techRaw');
-  const compEl  = document.getElementById('techComp');
-  const saveEl  = document.getElementById('techSaving');
-  if (rawEl)  rawEl.textContent  = stats.rawBytes + ' B';
-  if (compEl) compEl.textContent = stats.storedBytes + ' B';
-  if (saveEl) saveEl.textContent = stats.totalSaving + '%';
+  const imgOri  = document.getElementById('techImgOri');
+  const imgComp = document.getElementById('techImgComp');
+  const imgSave = document.getElementById('techImgSaving');
+  const imgDims = document.getElementById('techImgDims');
+  if (stats.imgOriginal !== null) {
+    if (imgOri)  imgOri.textContent  = stats.imgOriginal  + ' B';
+    if (imgComp) imgComp.textContent = stats.imgCompressed + ' B';
+    if (imgSave) imgSave.textContent = stats.imgSaving    + '%';
+    if (imgDims) imgDims.textContent = stats.imgDims      || '—';
+  } else {
+    if (imgOri)  imgOri.textContent  = 'Buka soal bergambar';
+    if (imgComp) imgComp.textContent = '—';
+    if (imgSave) imgSave.textContent = '—';
+    if (imgDims) imgDims.textContent = '—';
+  }
 
   // HTTPS
   const httpsEl = document.getElementById('techHTTPS');
@@ -443,35 +465,135 @@ function injectCompressionDemo() {
   const div = document.createElement('div');
   div.className = 'compress-demo';
   div.id = 'compressDemo';
-  div.innerHTML = `
-    <div class="compress-demo-title">📦 Kompresi Data Aktif</div>
-    <div class="compress-bar-wrap">
-      <div class="compress-bar-label"><span>Data Asli (JSON)</span><span>${stats.rawBytes} bytes</span></div>
-      <div class="compress-bar-bg"><div class="compress-bar-fill red" style="width:100%"></div></div>
-    </div>
-    <div class="compress-bar-wrap">
-      <div class="compress-bar-label"><span>Setelah Kompresi + Enkripsi</span><span>${stats.storedBytes} bytes</span></div>
-      <div class="compress-bar-bg"><div class="compress-bar-fill" id="compFill" style="width:0%"></div></div>
-    </div>
-    <div class="compress-ratio">Penghematan: ${stats.totalSaving}% · Metode: XOR Cipher + Pattern Substitution</div>`;
-  card.appendChild(div);
 
-  // Animate bar
-  setTimeout(() => {
-    const fill = document.getElementById('compFill');
-    if (fill) fill.style.width = (100 - parseFloat(stats.totalSaving)) + '%';
-  }, 400);
+  if (stats.imgOriginal !== null) {
+    // Ada data kompresi gambar — tampilkan itu
+    const pct = parseFloat(stats.imgSaving) || 0;
+    div.innerHTML = `
+      <div class="compress-demo-title">📦 Kompresi Gambar Aktif</div>
+      <div class="compress-bar-wrap">
+        <div class="compress-bar-label"><span>Gambar Original</span><span>${stats.imgOriginal} B</span></div>
+        <div class="compress-bar-bg"><div class="compress-bar-fill red" style="width:100%"></div></div>
+      </div>
+      <div class="compress-bar-wrap">
+        <div class="compress-bar-label"><span>Setelah Kompresi JPEG</span><span>${stats.imgCompressed} B</span></div>
+        <div class="compress-bar-bg"><div class="compress-bar-fill" id="compFill" style="width:0%"></div></div>
+      </div>
+      <div class="compress-ratio">Penghematan: ${stats.imgSaving}% · Resolusi: ${stats.imgDims} · Canvas JPEG Quality 60%</div>`;
+    card.appendChild(div);
+    setTimeout(() => {
+      const fill = document.getElementById('compFill');
+      if (fill) fill.style.width = Math.max(10, 100 - pct) + '%';
+    }, 400);
+  } else {
+    // Belum ada soal bergambar yang dikerjakan
+    div.innerHTML = `
+      <div class="compress-demo-title">📦 Kompresi Gambar</div>
+      <div style="font-size:.82rem;color:var(--text-m);margin-top:.4rem;">
+        Kompresi gambar aktif via <strong>Canvas JPEG API</strong>.<br>
+        Kerjakan soal yang menggunakan gambar untuk melihat statistik kompresinya.
+      </div>`;
+    card.appendChild(div);
+  }
 }
 
 /* ─────────────────────────────────────────
    6. VOICE: live waveform during recording
+   FIXED: buat AudioContext sendiri dari MediaStream mic
+   supaya tidak bergantung pada analyser yang mungkin null
 ───────────────────────────────────────── */
+let _voiceAC = null, _voiceAnalyser = null, _voiceAnimId = null, _voiceCtx = null;
+
 function initVoiceWaveform() {
   const canvas = document.getElementById('voiceCanvas');
-  if (canvas) AudioVisualizer.initVoiceCanvas(canvas);
+  if (!canvas) return;
+
+  // Minta akses mic untuk buat AudioContext dari stream nyata
+  if (!navigator.mediaDevices) { _fallbackWaveform(canvas); return; }
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    _voiceAC = new (window.AudioContext || window.webkitAudioContext)();
+    const src = _voiceAC.createMediaStreamSource(stream);
+    _voiceAnalyser = _voiceAC.createAnalyser();
+    _voiceAnalyser.fftSize = 256;
+    _voiceAnalyser.smoothingTimeConstant = 0.8;
+    src.connect(_voiceAnalyser);
+    // Simpan stream di window supaya bisa di-stop
+    window._voiceStream = stream;
+
+    // Setup canvas
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = canvas.offsetWidth  * dpr;
+    canvas.height = canvas.offsetHeight * dpr;
+    _voiceCtx = canvas.getContext('2d');
+    _voiceCtx.scale(dpr, dpr);
+
+    _drawVoiceLoop(canvas);
+  }).catch(() => _fallbackWaveform(canvas));
 }
+
+function _drawVoiceLoop(canvas) {
+  if (!_voiceAnalyser || !_voiceCtx) return;
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  const bufLen = _voiceAnalyser.fftSize;
+  const timeDomain = new Uint8Array(bufLen);
+
+  function draw() {
+    _voiceAnimId = requestAnimationFrame(draw);
+    _voiceAnalyser.getByteTimeDomainData(timeDomain);
+    _voiceCtx.clearRect(0, 0, W, H);
+    // Background
+    _voiceCtx.fillStyle = 'rgba(255,107,53,.06)';
+    _voiceCtx.fillRect(0, 0, W, H);
+    // Waveform line
+    _voiceCtx.beginPath();
+    _voiceCtx.strokeStyle = '#FF6B35';
+    _voiceCtx.lineWidth = 2.5;
+    _voiceCtx.lineJoin = 'round';
+    const sliceW = W / bufLen;
+    timeDomain.forEach((v, i) => {
+      const y = (v / 128.0) * (H / 2);
+      i === 0 ? _voiceCtx.moveTo(0, y) : _voiceCtx.lineTo(i * sliceW, y);
+    });
+    _voiceCtx.stroke();
+    // Center line
+    _voiceCtx.beginPath();
+    _voiceCtx.strokeStyle = 'rgba(255,107,53,.15)';
+    _voiceCtx.lineWidth = 1;
+    _voiceCtx.moveTo(0, H/2); _voiceCtx.lineTo(W, H/2);
+    _voiceCtx.stroke();
+  }
+  draw();
+}
+
+function _fallbackWaveform(canvas) {
+  // Animasi sederhana kalau tidak bisa akses mic stream
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 300, H = canvas.offsetHeight || 48;
+  canvas.width = W; canvas.height = H;
+  let t = 0;
+  function draw() {
+    _voiceAnimId = requestAnimationFrame(draw);
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(255,107,53,.06)'; ctx.fillRect(0, 0, W, H);
+    ctx.beginPath(); ctx.strokeStyle = 'rgba(255,107,53,.4)'; ctx.lineWidth = 2;
+    for (let i = 0; i < W; i++) {
+      const y = H/2 + Math.sin((i/W)*Math.PI*6 + t) * (H/4) * Math.sin(t*0.7);
+      i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y);
+    }
+    ctx.stroke(); t += 0.08;
+  }
+  draw();
+}
+
 function stopVoiceWaveform() {
-  AudioVisualizer.clearVoiceCanvas();
+  if (_voiceAnimId) { cancelAnimationFrame(_voiceAnimId); _voiceAnimId = null; }
+  if (_voiceAC) { try { _voiceAC.close(); } catch(e){} _voiceAC = null; }
+  if (window._voiceStream) { window._voiceStream.getTracks().forEach(t => t.stop()); window._voiceStream = null; }
+  _voiceAnalyser = null; _voiceCtx = null;
+  // Clear canvas
+  const canvas = document.getElementById('voiceCanvas');
+  if (canvas) { const ctx = canvas.getContext('2d'); ctx?.clearRect(0,0,canvas.width,canvas.height); }
 }
 
 /* ─────────────────────────────────────────
